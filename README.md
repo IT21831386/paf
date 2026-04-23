@@ -156,11 +156,11 @@ App runs at `http://localhost:5173`
 
 | Member | Branch | Modules | Backend | Frontend |
 |--------|--------|---------|---------|----------|
-| Sulochana | `sulochana` | A — Facilities | Resource CRUD + search/filter | Resource list & form |
-| Kanishka | `kanishka` | B — Booking | *(pending)* | *(pending)* |
+| Kanishka | `kanishka` | A — Facilities | Resource CRUD + search/filter | Resource list & form |
+| Upeka | `upeka` | B — Booking | *(pending)* | *(pending)* |
 | Dineesha | `dineesha` | C — Tickets | Ticket + Comment full CRUD, file uploads, status workflow | Ticket list, create, detail with comments |
 | Lasitha | `lasitha` | D + E — Notifications & Auth | Notification CRUD, User register/login/role mgmt | Notification bell, Login/Register, User management |
-| Oshada | `main` | F — Visitor Access | Visitor request workflow with QR passes | Visitor request list & form |
+| Sulochana | `sulochana` | F — Visitor Access | Visitor request workflow with QR passes | Visitor request list & form |
 
 ## CI/CD
 
