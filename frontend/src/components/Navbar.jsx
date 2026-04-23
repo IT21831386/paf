@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FaBuilding, FaUserShield, FaHome, FaSignInAlt, FaUsers } from 'react-icons/fa';
+import { FaBuilding, FaUserShield, FaHome, FaSignInAlt, FaUsers, FaTools } from 'react-icons/fa';
 import NotificationPanel from '../pages/notification/NotificationPanel';
 import './Navbar.css';
 
