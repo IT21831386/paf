@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { FaBuilding, FaUserShield, FaHome } from 'react-icons/fa';
+import { FaBuilding, FaUserShield, FaHome, FaTools } from 'react-icons/fa';
 import './Navbar.css';
 
 function Navbar() {
@@ -21,6 +21,9 @@ function Navbar() {
         </Link>
         <Link to="/resources" className={`nav-link ${isActive('/resources') ? 'active' : ''}`}>
           <FaBuilding /> <span>Facilities</span>
+        </Link>
+        <Link to="/tickets" className={`nav-link ${isActive('/tickets') ? 'active' : ''}`}>
+          <FaTools /> <span>Tickets</span>
         </Link>
         <Link to="/visitor-requests" className={`nav-link ${isActive('/visitor-requests') ? 'active' : ''}`}>
           <FaUserShield /> <span>Visitor Access</span>

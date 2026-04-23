@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { FaBuilding, FaUserShield, FaArrowRight } from 'react-icons/fa';
+import { FaBuilding, FaUserShield, FaTools, FaArrowRight } from 'react-icons/fa';
 import './Home.css';
 
 function Home() {
@@ -26,6 +26,17 @@ function Home() {
             </div>
             <h3>Facilities & Assets</h3>
             <p>Manage bookable resources — lecture halls, labs, meeting rooms, and equipment.</p>
+            <span className="module-link">
+              Explore <FaArrowRight size={12} />
+            </span>
+          </Link>
+
+          <Link to="/tickets" className="module-card">
+            <div className="module-icon" style={{ background: 'linear-gradient(135deg, #f97316, #eab308)' }}>
+              <FaTools size={28} />
+            </div>
+            <h3>Maintenance & Tickets</h3>
+            <p>Report incidents, track repairs, and communicate with technicians.</p>
             <span className="module-link">
               Explore <FaArrowRight size={12} />
             </span>
