@@ -52,6 +52,16 @@ export const updateUserProfile = (id, data) => api.put(`/auth/users/${id}/profil
 export const deleteUser = (id) => api.delete(`/auth/users/${id}`);
 
 
+// ==================== MODULE B: BOOKINGS ====================
+
+export const getAllBookings = (params) => api.get('/bookings', { params });
+export const getBookingById = (id) => api.get(`/bookings/${id}`);
+export const createBooking = (data) => api.post('/bookings', data);
+export const updateBooking = (id, data) => api.put(`/bookings/${id}`, data);
+export const cancelBooking = (id) => api.put(`/bookings/${id}/cancel`);
+export const deleteBooking = (id) => api.delete(`/bookings/${id}`);
+
+
 // ==================== MODULE F: VISITOR REQUESTS ====================
 
 export const getAllVisitorRequests = (params) => api.get('/visitor-requests', { params });

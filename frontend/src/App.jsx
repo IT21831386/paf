@@ -10,6 +10,9 @@ import UserManagement from './pages/auth/UserManagement';
 import TicketList from './pages/ticket/TicketList';
 import CreateTicket from './pages/ticket/CreateTicket';
 import TicketDetail from './pages/ticket/TicketDetail';
+import BookingList from './pages/booking/BookingList';
+import BookingForm from './pages/booking/BookingForm';
+import BookingDetail from './pages/booking/BookingDetail';
 
 function App() {
   return (
@@ -25,6 +28,11 @@ function App() {
           <Route path="tickets" element={<TicketList />} />
           <Route path="tickets/new" element={<CreateTicket />} />
           <Route path="tickets/:id" element={<TicketDetail />} />
+          {/* Module B: Meeting Room Bookings */}
+          <Route path="bookings" element={<BookingList />} />
+          <Route path="bookings/new" element={<BookingForm />} />
+          <Route path="bookings/edit/:id" element={<BookingForm />} />
+          <Route path="bookings/:id" element={<BookingDetail />} />
           {/* Module F: Visitor & Event Access */}
           <Route path="visitor-requests" element={<VisitorRequestList />} />
           <Route path="visitor-requests/new" element={<VisitorRequestForm />} />

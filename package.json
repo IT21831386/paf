@@ -1,0 +1,13 @@
+{
+  "name": "paf",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "backend": "mvn -f backend/pom.xml spring-boot:run",
+    "frontend": "npm --prefix frontend run dev",
+    "start": "npx concurrently --kill-others-on-fail \"npm run backend\" \"npm run frontend\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  }
+}
