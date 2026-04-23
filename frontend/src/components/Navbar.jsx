@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FaBuilding, FaUserShield, FaHome, FaSignInAlt, FaUsers, FaTools } from 'react-icons/fa';
+import { FaBuilding, FaUserShield, FaHome, FaSignInAlt, FaUsers, FaTools, FaCalendarAlt } from 'react-icons/fa';
 import NotificationPanel from '../pages/notification/NotificationPanel';
 import './Navbar.css';
 
@@ -33,6 +33,9 @@ function Navbar() {
         </Link>
         <Link to="/resources" className={`nav-link ${isActive('/resources') ? 'active' : ''}`}>
           <FaBuilding /> <span>Facilities</span>
+        </Link>
+        <Link to="/bookings" className={`nav-link ${isActive('/bookings') ? 'active' : ''}`}>
+          <FaCalendarAlt /> <span>Bookings</span>
         </Link>
         <Link to="/tickets" className={`nav-link ${isActive('/tickets') ? 'active' : ''}`}>
           <FaTools /> <span>Tickets</span>
