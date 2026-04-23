@@ -5,6 +5,8 @@ import ResourceList from './pages/facility/ResourceList';
 import ResourceForm from './pages/facility/ResourceForm';
 import VisitorRequestList from './pages/visitor/VisitorRequestList';
 import VisitorRequestForm from './pages/visitor/VisitorRequestForm';
+import LoginPage from './pages/auth/LoginPage';
+import UserManagement from './pages/auth/UserManagement';
 import TicketList from './pages/ticket/TicketList';
 import CreateTicket from './pages/ticket/CreateTicket';
 import TicketDetail from './pages/ticket/TicketDetail';
@@ -26,6 +28,9 @@ function App() {
           {/* Module F: Visitor & Event Access */}
           <Route path="visitor-requests" element={<VisitorRequestList />} />
           <Route path="visitor-requests/new" element={<VisitorRequestForm />} />
+          {/* Module E: Auth */}
+          <Route path="login" element={<LoginPage />} />
+          <Route path="users" element={<UserManagement />} />
         </Route>
       </Routes>
     </Router>
