@@ -10,8 +10,8 @@ frontend/dist/
 frontend/.cache/
 
 # ========== Environment ==========
-.env
-backend/.env
+# .env
+# backend/.env
 
 # ========== IDE ==========
 .idea/
