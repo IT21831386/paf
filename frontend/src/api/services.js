@@ -8,6 +8,30 @@ export const createResource = (data) => api.post('/resources', data);
 export const updateResource = (id, data) => api.put(`/resources/${id}`, data);
 export const deleteResource = (id) => api.delete(`/resources/${id}`);
 
+
+// ==================== MODULE C: TICKETS ====================
+
+export const getAllTickets = (params) => api.get('/tickets', { params });
+export const getTicketById = (id) => api.get(`/tickets/${id}`);
+export const getMyTickets = (userId) => api.get(`/tickets/my/${userId}`);
+export const createTicket = (formData) => api.post('/tickets', formData, {
+  headers: { 'Content-Type': 'multipart/form-data' },
+});
+export const updateTicket = (id, data) => api.put(`/tickets/${id}`, data);
+export const deleteTicket = (id) => api.delete(`/tickets/${id}`);
+export const assignTicket = (id, technicianId) => api.put(`/tickets/${id}/assign`, { technicianId });
+export const updateTicketStatus = (id, status, notes) => api.put(`/tickets/${id}/status`, { status, notes });
+
+// ==================== MODULE C: COMMENTS ====================
+
+export const getComments = (ticketId) => api.get(`/tickets/${ticketId}/comments`);
+export const addComment = (ticketId, comment) => api.post(`/tickets/${ticketId}/comments`, comment);
+export const updateComment = (ticketId, commentId, userId, content) =>
+  api.put(`/tickets/${ticketId}/comments/${commentId}`, { userId, content });
+export const deleteComment = (ticketId, commentId, userId) =>
+  api.delete(`/tickets/${ticketId}/comments/${commentId}`, { params: { userId } });
+
+
 // ==================== MODULE D: NOTIFICATIONS ====================
 
 export const getUserNotifications = (userId) => api.get(`/notifications/${userId}`);
