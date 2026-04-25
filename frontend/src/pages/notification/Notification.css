@@ -171,3 +171,20 @@
     right: -60px;
   }
 }
+
+.notification-view-all {
+  display: block;
+  text-align: center;
+  padding: 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #a78bfa;
+  text-decoration: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  transition: background 0.15s;
+}
+
+.notification-view-all:hover {
+  background: rgba(167, 139, 250, 0.06);
+}
+

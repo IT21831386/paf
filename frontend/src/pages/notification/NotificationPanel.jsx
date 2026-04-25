@@ -1,9 +1,21 @@
 import { useState, useEffect, useRef } from 'react';
 import { getUserNotifications, markNotificationRead, markAllNotificationsRead, deleteNotification, getUnreadCount } from '../../api/services';
 import { FaBell, FaCheck, FaCheckDouble, FaTrash, FaTimes } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 import './Notification.css';
 
-function NotificationPanel({ userId = 'user1' }) {
+function NotificationPanel({ userId }) {
+  const timeAgo = (dateStr) => {
+    if (!dateStr) return '';
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return 'Just now';
+    if (mins < 60) return `${mins}m ago`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs}h ago`;
+    const days = Math.floor(hrs / 24);
+    return `${days}d ago`;
+  };
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
@@ -130,7 +142,7 @@ function NotificationPanel({ userId = 'user1' }) {
                   <span className="notification-title">{notif.title}</span>
                   <p className="notification-message">{notif.message}</p>
                   <span className="notification-time">
-                    {notif.createdAt ? new Date(notif.createdAt).toLocaleString() : ''}
+                    {timeAgo(notif.createdAt)}
                   </span>
                 </div>
                 <div className="notification-actions">
@@ -146,6 +158,9 @@ function NotificationPanel({ userId = 'user1' }) {
               </div>
             ))}
           </div>
+          <Link to="/notifications" className="notification-view-all" onClick={() => setIsOpen(false)}>
+            View All Notifications
+          </Link>
         </div>
       )}
     </div>
