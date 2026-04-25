@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { getAllResources, deleteResource } from '../../api/services';
 import { FaPlus, FaEdit, FaTrash, FaSearch, FaFilter } from 'react-icons/fa';
 import './Facility.css';
 
 function ResourceList() {
+  const navigate = useNavigate();
   const [resources, setResources] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -13,6 +14,10 @@ function ResourceList() {
   const [filterStatus, setFilterStatus] = useState('');
   const [filterLocation, setFilterLocation] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+
+  const storedUser = localStorage.getItem('user');
+  const user = storedUser ? JSON.parse(storedUser) : null;
+  const isAdmin = user?.role === 'ADMIN';
 
   const fetchResources = async () => {
     try {
@@ -43,7 +48,9 @@ function ResourceList() {
     fetchResources();
   };
 
-  const handleDelete = async (id, name) => {
+  const handleDelete = async (e, id, name) => {
+    e.stopPropagation();
+    e.preventDefault();
     if (window.confirm(`Are you sure you want to delete "${name}"?`)) {
       try {
         await deleteResource(id);
@@ -68,7 +75,7 @@ function ResourceList() {
       ACTIVE: 'badge badge-success',
       OUT_OF_SERVICE: 'badge badge-danger',
     };
-    return <span className={classes[status] || 'badge'}>{status}</span>;
+    return <span className={classes[status] || 'badge'}>{status?.replace('_', ' ')}</span>;
   };
 
   const getTypeBadge = (type) => {
@@ -86,11 +93,16 @@ function ResourceList() {
       <div className="page-header">
         <div>
           <h1 className="page-title">Facilities & Assets</h1>
-          <p className="page-subtitle">Manage bookable campus resources</p>
+          <p className="page-subtitle">
+            {!loading && !error && `${resources.length} resource${resources.length !== 1 ? 's' : ''} found`}
+            {(loading || error) && 'Manage bookable campus resources'}
+          </p>
         </div>
-        <Link to="/resources/new" className="btn btn-primary">
-          <FaPlus /> Add Resource
-        </Link>
+        {isAdmin && (
+          <Link to="/resources/new" className="btn btn-primary">
+            <FaPlus /> Add Resource
+          </Link>
+        )}
       </div>
 
       <form className="search-bar" onSubmit={handleSearch}>
@@ -141,15 +153,15 @@ function ResourceList() {
 
       {!loading && !error && resources.length === 0 && (
         <div className="empty-state">
-          <p>No resources found. Add your first resource to get started!</p>
-          <Link to="/resources/new" className="btn btn-primary"><FaPlus /> Add Resource</Link>
+          <p>No resources found. {isAdmin ? 'Add your first resource to get started!' : ''}</p>
+          {isAdmin && <Link to="/resources/new" className="btn btn-primary"><FaPlus /> Add Resource</Link>}
         </div>
       )}
 
       {!loading && !error && resources.length > 0 && (
         <div className="resource-grid">
           {resources.map((resource) => (
-            <div key={resource.id} className="resource-card">
+            <div key={resource.id} className="resource-card" onClick={() => navigate(`/resources/${resource.id}`)} style={{ cursor: 'pointer' }}>
               <div className="card-header">
                 <h3 className="card-title">{resource.name}</h3>
                 {getStatusBadge(resource.status)}
@@ -163,23 +175,17 @@ function ResourceList() {
                 {resource.description && (
                   <p className="card-description">{resource.description}</p>
                 )}
-                {resource.availabilityWindows && resource.availabilityWindows.length > 0 && (
-                  <div className="card-availability">
-                    <span className="availability-label">Availability:</span>
-                    {resource.availabilityWindows.map((window, i) => (
-                      <span key={i} className="availability-tag">{window}</span>
-                    ))}
-                  </div>
-                )}
               </div>
-              <div className="card-actions">
-                <Link to={`/resources/edit/${resource.id}`} className="btn btn-sm btn-ghost">
-                  <FaEdit /> Edit
-                </Link>
-                <button className="btn btn-sm btn-danger" onClick={() => handleDelete(resource.id, resource.name)}>
-                  <FaTrash /> Delete
-                </button>
-              </div>
+              {isAdmin && (
+                <div className="card-actions">
+                  <Link to={`/resources/edit/${resource.id}`} className="btn btn-sm btn-ghost" onClick={e => e.stopPropagation()}>
+                    <FaEdit /> Edit
+                  </Link>
+                  <button className="btn btn-sm btn-danger" onClick={(e) => handleDelete(e, resource.id, resource.name)}>
+                    <FaTrash /> Delete
+                  </button>
+                </div>
+              )}
             </div>
           ))}
         </div>
