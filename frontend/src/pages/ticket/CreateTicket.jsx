@@ -1,23 +1,36 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createTicket } from '../../api/services';
+import { createTicket, getAllResources } from '../../api/services';
 import { FaSave, FaArrowLeft, FaPaperclip } from 'react-icons/fa';
 import './Ticket.css';
 
 function CreateTicket() {
   const navigate = useNavigate();
+  const storedUser = localStorage.getItem('user');
+  const user = storedUser ? JSON.parse(storedUser) : null;
 
+  const [resources, setResources] = useState([]);
   const [formData, setFormData] = useState({
     resourceId: '',
-    userId: 'user1', // placeholder until auth
+    userId: user?.id || '',
     category: '',
     description: '',
     priority: 'MEDIUM',
-    contactDetails: '',
+    contactDetails: user?.email || '',
   });
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchResources = async () => {
+      try {
+        const res = await getAllResources();
+        setResources(res.data);
+      } catch {}
+    };
+    fetchResources();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -82,9 +95,17 @@ function CreateTicket() {
         <div className="form-grid">
           <div className="form-group">
             <label htmlFor="resourceId">Resource / Location *</label>
-            <input id="resourceId" name="resourceId" type="text" required
-              value={formData.resourceId} onChange={handleChange}
-              placeholder="e.g., Lab 101, Building A Corridor" />
+            <select id="resourceId" name="resourceId" required value={formData.resourceId} onChange={handleChange}>
+              <option value="">Select a resource or location</option>
+              {resources.map(r => (
+                <option key={r.id} value={r.name}>{r.name} — {r.location}</option>
+              ))}
+              <option value="__custom">Other (type below)</option>
+            </select>
+            {formData.resourceId === '__custom' && (
+              <input type="text" name="resourceId" placeholder="Type custom location..."
+                onChange={handleChange} style={{ marginTop: '0.5rem' }} required />
+            )}
           </div>
 
           <div className="form-group">
