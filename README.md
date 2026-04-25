@@ -39,12 +39,12 @@ paf/
 
 | Module | Description | Member |
 |--------|-------------|--------|
-| A | Facilities & Assets Catalogue | Member 1 — Sulochana |
-| B | Booking Management | Member 2 — Kanishka |
+| A | Facilities & Assets Catalogue | Member 1 — Kanishka |
+| B | Booking Management | Member 2 — Upeka |
 | C | Maintenance & Incident Ticketing | Member 3 — Dineesha |
 | D | Notifications | Member 4 — Lasitha |
 | E | Authentication & Authorization | Member 4 — Lasitha |
-| F | Visitor & Event Access Management | Member 5 — Oshada |
+| F | Visitor & Event Access Management | Member 5 — Sulochana |
 
 ## Getting Started
 
