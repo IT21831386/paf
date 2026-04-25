@@ -58,6 +58,13 @@ public class AuthController {
         return ResponseEntity.ok(authService.updateProfile(id, body.get("name"), body.get("avatarUrl")));
     }
 
+    // PUT /api/auth/users/{id}/change-password
+    @PutMapping("/users/{id}/change-password")
+    public ResponseEntity<AuthResponse> changePassword(@PathVariable String id,
+                                                        @RequestBody Map<String, String> body) {
+        return ResponseEntity.ok(authService.changePassword(id, body.get("oldPassword"), body.get("newPassword")));
+    }
+
     // DELETE /api/auth/users/{id} - Delete user (Admin)
     @DeleteMapping("/users/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable String id) {

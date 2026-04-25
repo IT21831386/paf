@@ -78,6 +78,24 @@ public class AuthService {
         return mapToResponse(saved, "Profile updated");
     }
 
+    // Change password
+    public AuthResponse changePassword(String id, String oldPassword, String newPassword) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + id));
+
+        if (!user.getPassword().equals(oldPassword)) {
+            throw new BadRequestException("Current password is incorrect");
+        }
+
+        if (newPassword == null || newPassword.length() < 6) {
+            throw new BadRequestException("New password must be at least 6 characters");
+        }
+
+        user.setPassword(newPassword);
+        User saved = userRepository.save(user);
+        return mapToResponse(saved, "Password changed successfully");
+    }
+
     // Delete user (Admin)
     public void deleteUser(String id) {
         if (!userRepository.existsById(id)) {
