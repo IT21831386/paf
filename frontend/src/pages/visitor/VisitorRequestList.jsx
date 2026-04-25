@@ -10,20 +10,20 @@ import './Visitor.css';
 
 function VisitorRequestList() {
   const navigate = useNavigate();
+  const storedUser = localStorage.getItem('user');
+  const user = storedUser ? JSON.parse(storedUser) : null;
+  const isAdmin = user?.role === 'ADMIN';
+  const isSecurity = user?.role === 'SECURITY';
+
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filterStatus, setFilterStatus] = useState('');
   const [filterDepartment, setFilterDepartment] = useState('');
   const [showFilters, setShowFilters] = useState(false);
-  const [showMyRequests, setShowMyRequests] = useState(false);
+  const [showMyRequests, setShowMyRequests] = useState(!isAdmin && !isSecurity);
   const [rejectId, setRejectId] = useState(null);
   const [rejectReason, setRejectReason] = useState('');
-
-  const storedUser = localStorage.getItem('user');
-  const user = storedUser ? JSON.parse(storedUser) : null;
-  const isAdmin = user?.role === 'ADMIN';
-  const isSecurity = user?.role === 'SECURITY';
 
   const fetchRequests = async () => {
     try {
@@ -112,18 +112,22 @@ function VisitorRequestList() {
       </div>
 
       <div className="search-bar">
-        <button
-          type="button"
-          className={`btn ${showMyRequests ? 'btn-primary' : 'btn-ghost'}`}
-          onClick={() => setShowMyRequests(!showMyRequests)}
-        >
-          <FaUser /> {showMyRequests ? 'My Requests' : 'All Requests'}
-        </button>
-        <button type="button" className="btn btn-ghost" onClick={() => setShowFilters(!showFilters)}>
-          <FaFilter /> Filters
-        </button>
+        {(isAdmin || isSecurity) && (
+          <>
+            <button
+              type="button"
+              className={`btn ${showMyRequests ? 'btn-primary' : 'btn-ghost'}`}
+              onClick={() => setShowMyRequests(!showMyRequests)}
+            >
+              <FaUser /> {showMyRequests ? 'My Requests' : 'All Requests'}
+            </button>
+            <button type="button" className="btn btn-ghost" onClick={() => setShowFilters(!showFilters)}>
+              <FaFilter /> Filters
+            </button>
+          </>
+        )}
         <button className="btn btn-primary" onClick={fetchRequests}>
-          <FaSearch /> Search
+          <FaSearch /> {(isAdmin || isSecurity) ? 'Search' : 'Refresh'}
         </button>
       </div>
 
@@ -167,7 +171,6 @@ function VisitorRequestList() {
       {!loading && !error && requests.length === 0 && (
         <div className="empty-state">
           <p>No visitor requests found.</p>
-          <Link to="/visitor-requests/new" className="btn btn-primary"><FaPlus /> Create Request</Link>
         </div>
       )}
 
@@ -176,37 +179,48 @@ function VisitorRequestList() {
           {requests.map(r => (
             <div key={r.id} className="visitor-card" onClick={() => navigate(`/visitor-requests/${r.id}`)} style={{ cursor: 'pointer' }}>
               <div className="visitor-card-header">
-                <h3>{r.visitorName}</h3>
+                <div>
+                  <h3 className="visitor-name">{r.visitorName}</h3>
+                  <span className="visitor-purpose">{r.purpose}</span>
+                </div>
                 {getStatusBadge(r.status)}
               </div>
               <div className="visitor-card-body">
-                <div className="visitor-info">
-                  <span>📋 {r.purpose}</span>
-                  <span>👤 Host: {r.hostPerson}</span>
-                  <span>📅 {r.visitDate} at {r.visitTime}</span>
-                  <span>📍 {r.location}</span>
-                  <span>👥 {r.numberOfVisitors} visitor(s)</span>
+                <div className="visitor-info-grid">
+                  <div className="visitor-info-item">
+                    <span className="visitor-info-label">Host</span>
+                    <span className="visitor-info-value">{r.hostPerson}</span>
+                  </div>
+                  <div className="visitor-info-item">
+                    <span className="visitor-info-label">Date & Time</span>
+                    <span className="visitor-info-value">{r.visitDate} · {r.visitTime}</span>
+                  </div>
+                  <div className="visitor-info-item">
+                    <span className="visitor-info-label">Location</span>
+                    <span className="visitor-info-value">{r.location}</span>
+                  </div>
+                  <div className="visitor-info-item">
+                    <span className="visitor-info-label">Visitors</span>
+                    <span className="visitor-info-value">{r.numberOfVisitors}</span>
+                  </div>
                 </div>
               </div>
               <div className="visitor-card-actions" onClick={e => e.stopPropagation()}>
-                <Link to={`/visitor-requests/${r.id}`} className="btn btn-sm btn-primary" onClick={e => e.stopPropagation()}>
-                  <FaEye /> Detail
+                <Link to={`/visitor-requests/${r.id}`} className="btn btn-sm btn-ghost" onClick={e => e.stopPropagation()}>
+                  <FaEye /> View
                 </Link>
-                {/* Admin-only approve/reject */}
                 {isAdmin && r.status === 'PENDING' && (
                   <>
                     <button className="btn btn-sm btn-primary" onClick={(e) => { e.stopPropagation(); handleApprove(r.id); }}><FaCheck /> Approve</button>
                     <button className="btn btn-sm btn-danger" onClick={(e) => { e.stopPropagation(); setRejectId(r.id); }}><FaTimes /> Reject</button>
                   </>
                 )}
-                {/* Security/Admin check-in/out */}
                 {(isSecurity || isAdmin) && r.status === 'APPROVED' && (
-                  <button className="btn btn-sm btn-primary" onClick={(e) => { e.stopPropagation(); handleCheckIn(r.id); }}><FaSignInAlt /> In</button>
+                  <button className="btn btn-sm btn-primary" onClick={(e) => { e.stopPropagation(); handleCheckIn(r.id); }}><FaSignInAlt /> Check In</button>
                 )}
                 {(isSecurity || isAdmin) && r.status === 'CHECKED_IN' && (
-                  <button className="btn btn-sm btn-primary" onClick={(e) => { e.stopPropagation(); handleCheckOut(r.id); }}><FaSignOutAlt /> Out</button>
+                  <button className="btn btn-sm btn-primary" onClick={(e) => { e.stopPropagation(); handleCheckOut(r.id); }}><FaSignOutAlt /> Check Out</button>
                 )}
-                {/* Delete for admin or own request */}
                 {(isAdmin || (user && r.createdBy === user.id)) && (
                   <button className="btn btn-sm btn-danger" onClick={(e) => { e.stopPropagation(); handleDelete(r.id); }}><FaTrash /></button>
                 )}
