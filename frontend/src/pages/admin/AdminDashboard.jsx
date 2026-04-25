@@ -1,26 +1,36 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FaUsers, FaBuilding, FaTools, FaUserShield, FaArrowRight, FaChartBar } from 'react-icons/fa';
+import {
+  AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
+} from 'recharts';
 import api from '../../api/axiosInstance';
 import './Admin.css';
+
+const CHART_COLORS = ['#a78bfa', '#60a5fa', '#f97316', '#f43f5e', '#4ade80', '#fbbf24', '#ec4899', '#06b6d4'];
+const PRIORITY_COLORS = { LOW: '#4ade80', MEDIUM: '#fbbf24', HIGH: '#f97316', CRITICAL: '#f43f5e' };
 
 function AdminDashboard() {
   const [stats, setStats] = useState(null);
   const [recentTickets, setRecentTickets] = useState([]);
   const [recentVisitors, setRecentVisitors] = useState([]);
+  const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [statsRes, ticketsRes, visitorsRes] = await Promise.all([
+        const [statsRes, ticketsRes, visitorsRes, analyticsRes] = await Promise.all([
           api.get('/admin/stats'),
           api.get('/admin/recent-tickets'),
           api.get('/admin/recent-visitors'),
+          api.get('/admin/analytics'),
         ]);
         setStats(statsRes.data);
         setRecentTickets(ticketsRes.data);
         setRecentVisitors(visitorsRes.data);
+        setAnalytics(analyticsRes.data);
       } catch (err) {
         console.error('Failed to load dashboard', err);
       } finally {
@@ -40,6 +50,20 @@ function AdminDashboard() {
     return <span className={map[status] || 'badge'}>{status?.replace('_', ' ')}</span>;
   };
 
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (!active || !payload?.length) return null;
+    return (
+      <div className="chart-tooltip">
+        <p className="chart-tooltip-label">{label}</p>
+        {payload.map((p, i) => (
+          <p key={i} style={{ color: p.color, fontSize: '0.8rem' }}>
+            {p.name}: <strong>{p.value}</strong>
+          </p>
+        ))}
+      </div>
+    );
+  };
+
   if (loading) return <div className="page-container"><div className="loading-spinner">Loading dashboard...</div></div>;
 
   return (
@@ -47,7 +71,7 @@ function AdminDashboard() {
       <div className="page-header">
         <div>
           <h1 className="page-title"><FaChartBar /> Admin Dashboard</h1>
-          <p className="page-subtitle">System-wide overview and quick actions</p>
+          <p className="page-subtitle">System-wide overview and analytics</p>
         </div>
       </div>
 
@@ -83,9 +107,107 @@ function AdminDashboard() {
         </div>
       </div>
 
-      {/* Breakdown Panels */}
+      {/* ========== ANALYTICS CHARTS ========== */}
+      {analytics && (
+        <>
+          {/* Row 1: Ticket Trends + Visitor Traffic */}
+          <div className="dashboard-panels">
+            <div className="dashboard-panel chart-panel">
+              <div className="panel-header">
+                <h3>📈 Ticket Trends (Last 7 Days)</h3>
+              </div>
+              <ResponsiveContainer width="100%" height={240}>
+                <AreaChart data={analytics.ticketTrends}>
+                  <defs>
+                    <linearGradient id="gradCreated" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#a78bfa" stopOpacity={0.4} />
+                      <stop offset="100%" stopColor="#a78bfa" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="gradResolved" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#4ade80" stopOpacity={0.4} />
+                      <stop offset="100%" stopColor="#4ade80" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+                  <XAxis dataKey="day" tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} />
+                  <YAxis tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} allowDecimals={false} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Legend wrapperStyle={{ fontSize: '0.75rem', color: '#94a3b8' }} />
+                  <Area type="monotone" dataKey="created" name="Created" stroke="#a78bfa" fill="url(#gradCreated)" strokeWidth={2} />
+                  <Area type="monotone" dataKey="resolved" name="Resolved" stroke="#4ade80" fill="url(#gradResolved)" strokeWidth={2} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="dashboard-panel chart-panel">
+              <div className="panel-header">
+                <h3>🎫 Visitor Traffic (Last 7 Days)</h3>
+              </div>
+              <ResponsiveContainer width="100%" height={240}>
+                <BarChart data={analytics.visitorTraffic}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+                  <XAxis dataKey="day" tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} />
+                  <YAxis tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} allowDecimals={false} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Bar dataKey="visitors" name="Visitors" fill="#60a5fa" radius={[6, 6, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Row 2: Category Pie + Priority Bar */}
+          <div className="dashboard-panels">
+            <div className="dashboard-panel chart-panel">
+              <div className="panel-header">
+                <h3>🔧 Tickets by Category</h3>
+              </div>
+              {analytics.ticketsByCategory?.length > 0 ? (
+                <ResponsiveContainer width="100%" height={260}>
+                  <PieChart>
+                    <Pie
+                      data={analytics.ticketsByCategory}
+                      cx="50%" cy="50%"
+                      innerRadius={55} outerRadius={90}
+                      paddingAngle={3}
+                      dataKey="value"
+                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    >
+                      {analytics.ticketsByCategory.map((_, i) => (
+                        <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <p className="panel-empty">No category data available</p>
+              )}
+            </div>
+
+            <div className="dashboard-panel chart-panel">
+              <div className="panel-header">
+                <h3>⚡ Tickets by Priority</h3>
+              </div>
+              <ResponsiveContainer width="100%" height={260}>
+                <BarChart data={analytics.ticketsByPriority} layout="vertical">
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+                  <XAxis type="number" tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} allowDecimals={false} />
+                  <YAxis type="category" dataKey="priority" tick={{ fill: '#94a3b8', fontSize: 12, fontWeight: 600 }} axisLine={false} width={70} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Bar dataKey="count" name="Tickets" radius={[0, 6, 6, 0]}>
+                    {analytics.ticketsByPriority?.map((entry, i) => (
+                      <Cell key={i} fill={PRIORITY_COLORS[entry.priority] || '#a78bfa'} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Status Breakdowns */}
       <div className="dashboard-panels">
-        {/* Ticket Breakdown */}
         <div className="dashboard-panel">
           <div className="panel-header">
             <h3>Ticket Status Breakdown</h3>
@@ -115,7 +237,6 @@ function AdminDashboard() {
           </div>
         </div>
 
-        {/* Visitor Breakdown */}
         <div className="dashboard-panel">
           <div className="panel-header">
             <h3>Visitor Status Breakdown</h3>
@@ -140,7 +261,6 @@ function AdminDashboard() {
 
       {/* Recent Activity Tables */}
       <div className="dashboard-panels">
-        {/* Recent Tickets */}
         <div className="dashboard-panel">
           <div className="panel-header">
             <h3>Recent Tickets</h3>
@@ -166,7 +286,6 @@ function AdminDashboard() {
           )}
         </div>
 
-        {/* Recent Visitors */}
         <div className="dashboard-panel">
           <div className="panel-header">
             <h3>Recent Visitor Requests</h3>

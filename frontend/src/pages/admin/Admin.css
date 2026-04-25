@@ -236,3 +236,32 @@
   color: #e2e8f0;
   transform: translateY(-1px);
 }
+
+/* Chart Panels */
+.chart-panel {
+  padding-bottom: 0.5rem;
+}
+
+.chart-tooltip {
+  background: #1e1b3a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.chart-tooltip-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #e2e8f0;
+  margin: 0 0 0.2rem;
+}
+
+.recharts-default-legend {
+  color: #94a3b8 !important;
+}
+
+.recharts-pie-label-text {
+  fill: #cbd5e1;
+  font-size: 0.72rem;
+}

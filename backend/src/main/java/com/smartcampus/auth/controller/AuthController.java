@@ -31,6 +31,14 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    // POST /api/auth/google - Google Sign In
+    @PostMapping("/google")
+    public ResponseEntity<AuthResponse> googleSignIn(@RequestBody Map<String, String> body) {
+        String credential = body.get("credential");
+        AuthResponse response = authService.googleSignIn(credential);
+        return ResponseEntity.ok(response);
+    }
+
     // GET /api/auth/me/{id} - Get current user
     @GetMapping("/me/{id}")
     public ResponseEntity<AuthResponse> getMe(@PathVariable String id) {

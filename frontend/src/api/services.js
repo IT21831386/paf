@@ -43,8 +43,9 @@ export const deleteNotification = (id) => api.delete(`/notifications/${id}`);
 
 // ==================== MODULE E: AUTH ====================
 
-export const registerUser = (data) => api.post('/auth/register', data);
 export const loginUser = (data) => api.post('/auth/login', data);
+export const registerUser = (data) => api.post('/auth/register', data);
+export const googleSignIn = (credential) => api.post('/auth/google', { credential });
 export const getCurrentUser = (id) => api.get(`/auth/me/${id}`);
 export const getAllUsers = () => api.get('/auth/users');
 export const updateUserRole = (id, role) => api.put(`/auth/users/${id}/role`, { role });
