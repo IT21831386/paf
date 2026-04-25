@@ -63,6 +63,13 @@ public class BookingController {
         return ResponseEntity.ok(bookingService.cancelBooking(id));
     }
 
+    // PUT /api/bookings/{id}/status
+    @PutMapping("/{id}/status")
+    public ResponseEntity<Booking> updateBookingStatus(@PathVariable String id,
+                                                        @RequestParam BookingStatus status) {
+        return ResponseEntity.ok(bookingService.updateStatus(id, status));
+    }
+
     // DELETE /api/bookings/{id}
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBooking(@PathVariable String id) {

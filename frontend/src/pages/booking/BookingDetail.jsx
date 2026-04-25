@@ -99,30 +99,52 @@ function BookingDetail() {
         </div>
       </div>
 
-      {/* Room & Schedule */}
+      {/* Resource & Schedule */}
       <div className="booking-detail-card">
-        <div className="booking-detail-section-title">Room & Schedule</div>
+        <div className="booking-detail-section-title">
+          {booking.returnDate ? 'Equipment & Schedule' : 'Room & Schedule'}
+        </div>
         <div className="booking-detail-grid">
           <div className="booking-detail-item">
-            <span className="booking-detail-key">Meeting Room</span>
-            <span className="booking-detail-value">🏢 {booking.roomName || booking.resourceId || '—'}</span>
+            <span className="booking-detail-key">
+              {booking.returnDate ? 'Equipment' : 'Meeting Room'}
+            </span>
+            <span className="booking-detail-value">
+              {booking.returnDate ? '📷' : '🏢'} {booking.roomName || booking.resourceId || '—'}
+            </span>
           </div>
           <div className="booking-detail-item">
-            <span className="booking-detail-key">Date</span>
+            <span className="booking-detail-key">
+              {booking.returnDate ? 'Need Date' : 'Date'}
+            </span>
             <span className="booking-detail-value">📅 {formatDate(booking.date)}</span>
           </div>
+          {booking.returnDate && (
+            <div className="booking-detail-item">
+              <span className="booking-detail-key">Return Date</span>
+              <span className="booking-detail-value">📅 {formatDate(booking.returnDate)}</span>
+            </div>
+          )}
           <div className="booking-detail-item">
-            <span className="booking-detail-key">Start Time</span>
+            <span className="booking-detail-key">
+              {booking.returnDate ? 'Need Time' : 'Start Time'}
+            </span>
             <span className="booking-detail-value">🕐 {booking.startTime || '—'}</span>
           </div>
           <div className="booking-detail-item">
-            <span className="booking-detail-key">End Time</span>
+            <span className="booking-detail-key">
+              {booking.returnDate ? 'Return Time' : 'End Time'}
+            </span>
             <span className="booking-detail-value">🕐 {booking.endTime || '—'}</span>
           </div>
           {booking.attendees && (
             <div className="booking-detail-item">
-              <span className="booking-detail-key">Attendees</span>
-              <span className="booking-detail-value">👥 {booking.attendees} people</span>
+              <span className="booking-detail-key">
+                {booking.returnDate ? 'Quantity Needed' : 'Attendees'}
+              </span>
+              <span className="booking-detail-value">
+                {booking.returnDate ? '📦' : '👥'} {booking.attendees} {booking.returnDate ? 'units' : 'people'}
+              </span>
             </div>
           )}
         </div>

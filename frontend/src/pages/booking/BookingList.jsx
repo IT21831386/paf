@@ -75,8 +75,8 @@ function BookingList() {
     <div className="booking-container">
       <div className="booking-header">
         <div>
-          <h1 className="booking-title">Meeting Room Bookings</h1>
-          <p className="booking-subtitle">Reserve campus meeting rooms for your team</p>
+          <h1 className="booking-title">Reserve Your Spot</h1>
+          <p className="booking-subtitle">Effortlessly book and manage campus facilities for your collaborative needs</p>
         </div>
         <Link to="/bookings/new" className="bk-btn bk-btn-primary">
           <FaPlus /> New Booking
