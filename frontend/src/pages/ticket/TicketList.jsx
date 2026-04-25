@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getAllTickets, deleteTicket } from '../../api/services';
-import { FaPlus, FaFilter, FaSearch, FaTrash, FaEye } from 'react-icons/fa';
+import { getAllTickets, getMyTickets, deleteTicket } from '../../api/services';
+import { FaPlus, FaFilter, FaSearch, FaTrash, FaEye, FaUser } from 'react-icons/fa';
 import './Ticket.css';
 
 function TicketList() {
@@ -12,16 +12,26 @@ function TicketList() {
   const [filterPriority, setFilterPriority] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  const [showMyTickets, setShowMyTickets] = useState(false);
+
+  const storedUser = localStorage.getItem('user');
+  const user = storedUser ? JSON.parse(storedUser) : null;
+  const isAdmin = user?.role === 'ADMIN';
+  const isTechnician = user?.role === 'TECHNICIAN';
 
   const fetchTickets = async () => {
     try {
       setLoading(true);
-      const params = {};
-      if (filterStatus) params.status = filterStatus;
-      if (filterPriority) params.priority = filterPriority;
-      if (filterCategory) params.category = filterCategory;
-
-      const response = await getAllTickets(params);
+      let response;
+      if (showMyTickets && user) {
+        response = await getMyTickets(user.id);
+      } else {
+        const params = {};
+        if (filterStatus) params.status = filterStatus;
+        if (filterPriority) params.priority = filterPriority;
+        if (filterCategory) params.category = filterCategory;
+        response = await getAllTickets(params);
+      }
       setTickets(response.data);
       setError(null);
     } catch (err) {
@@ -32,7 +42,7 @@ function TicketList() {
     }
   };
 
-  useEffect(() => { fetchTickets(); }, []);
+  useEffect(() => { fetchTickets(); }, [showMyTickets]);
 
   const handleDelete = async (id) => {
     if (window.confirm('Delete this ticket and all its comments?')) {
@@ -54,10 +64,8 @@ function TicketList() {
 
   const getStatusBadge = (status) => {
     const map = {
-      OPEN: 'badge badge-info',
-      IN_PROGRESS: 'badge badge-warning',
-      RESOLVED: 'badge badge-success',
-      CLOSED: 'badge badge-neutral',
+      OPEN: 'badge badge-info', IN_PROGRESS: 'badge badge-warning',
+      RESOLVED: 'badge badge-success', CLOSED: 'badge badge-neutral',
       REJECTED: 'badge badge-danger',
     };
     return <span className={map[status] || 'badge'}>{status?.replace('_', ' ')}</span>;
@@ -65,10 +73,8 @@ function TicketList() {
 
   const getPriorityBadge = (priority) => {
     const map = {
-      LOW: 'priority-badge priority-low',
-      MEDIUM: 'priority-badge priority-medium',
-      HIGH: 'priority-badge priority-high',
-      CRITICAL: 'priority-badge priority-critical',
+      LOW: 'priority-badge priority-low', MEDIUM: 'priority-badge priority-medium',
+      HIGH: 'priority-badge priority-high', CRITICAL: 'priority-badge priority-critical',
     };
     return <span className={map[priority] || 'priority-badge'}>{priority}</span>;
   };
@@ -78,7 +84,9 @@ function TicketList() {
       <div className="page-header">
         <div>
           <h1 className="page-title">Maintenance & Incident Tickets</h1>
-          <p className="page-subtitle">Track and resolve campus issues</p>
+          <p className="page-subtitle">
+            {!loading && !error ? `${tickets.length} ticket${tickets.length !== 1 ? 's' : ''} found` : 'Track and resolve campus issues'}
+          </p>
         </div>
         <Link to="/tickets/new" className="btn btn-primary">
           <FaPlus /> New Ticket
@@ -86,6 +94,13 @@ function TicketList() {
       </div>
 
       <div className="search-bar">
+        <button
+          type="button"
+          className={`btn ${showMyTickets ? 'btn-primary' : 'btn-ghost'}`}
+          onClick={() => setShowMyTickets(!showMyTickets)}
+        >
+          <FaUser /> {showMyTickets ? 'My Tickets' : 'All Tickets'}
+        </button>
         <button type="button" className="btn btn-ghost" onClick={() => setShowFilters(!showFilters)}>
           <FaFilter /> Filters
         </button>
@@ -153,9 +168,11 @@ function TicketList() {
                 <Link to={`/tickets/${ticket.id}`} className="btn btn-sm btn-primary">
                   <FaEye /> View Details
                 </Link>
-                <button className="btn btn-sm btn-danger" onClick={() => handleDelete(ticket.id)}>
-                  <FaTrash />
-                </button>
+                {(isAdmin || (user && ticket.userId === user.id)) && (
+                  <button className="btn btn-sm btn-danger" onClick={() => handleDelete(ticket.id)}>
+                    <FaTrash />
+                  </button>
+                )}
               </div>
             </div>
           ))}
