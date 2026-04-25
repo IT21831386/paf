@@ -49,6 +49,8 @@ export const getCurrentUser = (id) => api.get(`/auth/me/${id}`);
 export const getAllUsers = () => api.get('/auth/users');
 export const updateUserRole = (id, role) => api.put(`/auth/users/${id}/role`, { role });
 export const updateUserProfile = (id, data) => api.put(`/auth/users/${id}/profile`, data);
+export const changePassword = (id, oldPassword, newPassword) =>
+  api.put(`/auth/users/${id}/change-password`, { oldPassword, newPassword });
 export const deleteUser = (id) => api.delete(`/auth/users/${id}`);
 
 
@@ -64,3 +66,9 @@ export const approveVisitorRequest = (id) => api.put(`/visitor-requests/${id}/ap
 export const rejectVisitorRequest = (id, reason) => api.put(`/visitor-requests/${id}/reject`, { reason });
 export const checkInVisitorRequest = (id) => api.put(`/visitor-requests/${id}/check-in`);
 export const checkOutVisitorRequest = (id) => api.put(`/visitor-requests/${id}/check-out`);
+
+// ==================== ADMIN ====================
+
+export const getAdminStats = () => api.get('/admin/stats');
+export const getRecentTickets = () => api.get('/admin/recent-tickets');
+export const getRecentVisitors = () => api.get('/admin/recent-visitors');
