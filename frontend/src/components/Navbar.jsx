@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FaBuilding, FaUserShield, FaHome, FaSignInAlt, FaUsers, FaTools, FaCalendarAlt } from 'react-icons/fa';
+import { FaBuilding, FaUserShield, FaHome, FaSignInAlt, FaUsers, FaTools, FaChartBar, FaUser, FaBell, FaCalendarAlt } from 'react-icons/fa';
 import NotificationPanel from '../pages/notification/NotificationPanel';
 import './Navbar.css';
 
@@ -9,7 +9,6 @@ function Navbar() {
 
   const isActive = (path) => location.pathname.startsWith(path);
 
-  // Get logged in user from localStorage
   const storedUser = localStorage.getItem('user');
   const user = storedUser ? JSON.parse(storedUser) : null;
 
@@ -31,32 +30,44 @@ function Navbar() {
         <Link to="/" className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}>
           <FaHome /> <span>Home</span>
         </Link>
-        <Link to="/resources" className={`nav-link ${isActive('/resources') ? 'active' : ''}`}>
-          <FaBuilding /> <span>Facilities</span>
-        </Link>
-        <Link to="/bookings" className={`nav-link ${isActive('/bookings') ? 'active' : ''}`}>
+        {user && (
+          <>
+            <Link to="/resources" className={`nav-link ${isActive('/resources') ? 'active' : ''}`}>
+              <FaBuilding /> <span>Facilities</span>
+            </Link>
+            <Link to="/bookings" className={`nav-link ${isActive('/bookings') ? 'active' : ''}`}>
           <FaCalendarAlt /> <span>Bookings</span>
         </Link>
         <Link to="/tickets" className={`nav-link ${isActive('/tickets') ? 'active' : ''}`}>
-          <FaTools /> <span>Tickets</span>
-        </Link>
-        <Link to="/visitor-requests" className={`nav-link ${isActive('/visitor-requests') ? 'active' : ''}`}>
-          <FaUserShield /> <span>Visitor Access</span>
-        </Link>
+              <FaTools /> <span>Tickets</span>
+            </Link>
+            <Link to="/visitor-requests" className={`nav-link ${isActive('/visitor-requests') ? 'active' : ''}`}>
+              <FaUserShield /> <span>Visitor Access</span>
+            </Link>
+          </>
+        )}
         {user && user.role === 'ADMIN' && (
-          <Link to="/users" className={`nav-link ${isActive('/users') ? 'active' : ''}`}>
-            <FaUsers /> <span>Users</span>
-          </Link>
+          <>
+            <Link to="/admin" className={`nav-link ${isActive('/admin') ? 'active' : ''}`}>
+              <FaChartBar /> <span>Dashboard</span>
+            </Link>
+            <Link to="/users" className={`nav-link ${isActive('/users') ? 'active' : ''}`}>
+              <FaUsers /> <span>Users</span>
+            </Link>
+          </>
         )}
       </div>
       <div className="navbar-right">
         {user ? (
           <>
+            <Link to="/notifications" className={`nav-link ${isActive('/notifications') ? 'active' : ''}`} title="All Notifications">
+              <FaBell />
+            </Link>
             <NotificationPanel userId={user.id} />
-            <div className="nav-user">
+            <Link to="/profile" className="nav-user" title="My Profile">
               <span className="nav-user-name">{user.name}</span>
               <span className="nav-user-role">{user.role}</span>
-            </div>
+            </Link>
             <button className="nav-logout" onClick={handleLogout}>Logout</button>
           </>
         ) : (
