@@ -172,3 +172,82 @@
 .pass-details strong {
   color: #94a3b8;
 }
+
+/* ========== Visitor List Cards ========== */
+.visitor-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.visitor-card {
+  background: #1e1b3a;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  overflow: hidden;
+  transition: all 0.2s;
+}
+
+.visitor-card:hover {
+  border-color: rgba(167, 139, 250, 0.15);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.visitor-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 0.75rem 1rem 0;
+  gap: 0.75rem;
+}
+
+.visitor-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #e2e8f0;
+  margin: 0;
+}
+
+.visitor-purpose {
+  font-size: 0.78rem;
+  color: #94a3b8;
+  margin-top: 0.1rem;
+  display: block;
+}
+
+.visitor-card-body {
+  padding: 0.5rem 1rem;
+}
+
+.visitor-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.3rem 1.5rem;
+}
+
+.visitor-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.visitor-info-label {
+  font-size: 0.65rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  font-weight: 600;
+}
+
+.visitor-info-value {
+  font-size: 0.82rem;
+  color: #cbd5e1;
+}
+
+.visitor-card-actions {
+  display: flex;
+  gap: 0.4rem;
+  padding: 0.4rem 1rem 0.75rem;
+  flex-wrap: wrap;
+}
+
