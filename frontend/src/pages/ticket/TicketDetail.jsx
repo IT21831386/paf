@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   getTicketById, updateTicketStatus, assignTicket,
-  getComments, addComment, updateComment, deleteComment
+  getComments, addComment, updateComment, deleteComment, getAllUsers
 } from '../../api/services';
 import { FaArrowLeft, FaPaperPlane, FaEdit, FaTrash, FaUserCog } from 'react-icons/fa';
 import './Ticket.css';
@@ -10,6 +10,12 @@ import './Ticket.css';
 function TicketDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+
+  const storedUser = localStorage.getItem('user');
+  const user = storedUser ? JSON.parse(storedUser) : null;
+  const isAdmin = user?.role === 'ADMIN';
+  const isTechnician = user?.role === 'TECHNICIAN';
+  const canManage = isAdmin || isTechnician;
 
   const [ticket, setTicket] = useState(null);
   const [comments, setComments] = useState([]);
@@ -27,8 +33,7 @@ function TicketDetail() {
   const [statusNotes, setStatusNotes] = useState('');
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [techId, setTechId] = useState('');
-
-  const currentUserId = 'user1'; // placeholder until auth
+  const [technicianList, setTechnicianList] = useState([]);
 
   const fetchData = async () => {
     try {
@@ -49,6 +54,14 @@ function TicketDetail() {
   };
 
   useEffect(() => { fetchData(); }, [id]);
+
+  // Load technicians for assign dropdown
+  const loadTechnicians = async () => {
+    try {
+      const res = await getAllUsers();
+      setTechnicianList(res.data.filter(u => u.role === 'TECHNICIAN' || u.role === 'ADMIN'));
+    } catch {}
+  };
 
   // ---- Status ----
   const handleStatusUpdate = async () => {
@@ -78,9 +91,9 @@ function TicketDetail() {
   // ---- Comments ----
   const handleAddComment = async (e) => {
     e.preventDefault();
-    if (!newComment.trim()) return;
+    if (!newComment.trim() || !user) return;
     try {
-      await addComment(id, { userId: currentUserId, userName: 'Current User', content: newComment });
+      await addComment(id, { userId: user.id, userName: user.name, content: newComment });
       setNewComment('');
       const res = await getComments(id);
       setComments(res.data);
@@ -91,7 +104,7 @@ function TicketDetail() {
 
   const handleEditComment = async (commentId) => {
     try {
-      await updateComment(id, commentId, currentUserId, editContent);
+      await updateComment(id, commentId, user?.id, editContent);
       setEditingComment(null);
       setEditContent('');
       const res = await getComments(id);
@@ -104,7 +117,7 @@ function TicketDetail() {
   const handleDeleteComment = async (commentId) => {
     if (!window.confirm('Delete this comment?')) return;
     try {
-      await deleteComment(id, commentId, currentUserId);
+      await deleteComment(id, commentId, user?.id);
       setComments(comments.filter(c => c.id !== commentId));
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to delete comment.');
@@ -161,13 +174,13 @@ function TicketDetail() {
             {getStatusBadge(ticket.status)}
           </div>
           <div className="detail-actions-row">
-            {getNextStatuses(ticket.status).length > 0 && (
+            {canManage && getNextStatuses(ticket.status).length > 0 && (
               <button className="btn btn-sm btn-primary" onClick={() => setShowStatusModal(true)}>
                 Update Status
               </button>
             )}
-            {ticket.status !== 'CLOSED' && ticket.status !== 'REJECTED' && (
-              <button className="btn btn-sm btn-ghost" onClick={() => setShowAssignModal(true)}>
+            {canManage && ticket.status !== 'CLOSED' && ticket.status !== 'REJECTED' && (
+              <button className="btn btn-sm btn-ghost" onClick={() => { setShowAssignModal(true); loadTechnicians(); }}>
                 <FaUserCog /> Assign
               </button>
             )}
@@ -239,7 +252,7 @@ function TicketDetail() {
               <p className="comment-content">{comment.content}</p>
             )}
 
-            {comment.userId === currentUserId && editingComment !== comment.id && (
+            {user && comment.userId === user.id && editingComment !== comment.id && (
               <div className="comment-actions">
                 <button className="btn btn-sm btn-ghost" onClick={() => {
                   setEditingComment(comment.id);
@@ -297,9 +310,15 @@ function TicketDetail() {
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <h3>Assign Technician</h3>
             <div className="form-group">
-              <label>Technician ID / Name</label>
+              <label>Select Technician</label>
+              <select value={techId} onChange={(e) => setTechId(e.target.value)}>
+                <option value="">Choose...</option>
+                {technicianList.map(t => (
+                  <option key={t.id} value={t.id}>{t.name} ({t.role})</option>
+                ))}
+              </select>
               <input type="text" value={techId} onChange={(e) => setTechId(e.target.value)}
-                placeholder="Enter technician ID" />
+                placeholder="Or enter technician ID" style={{ marginTop: '0.5rem' }} />
             </div>
             <div className="modal-actions">
               <button className="btn btn-ghost" onClick={() => setShowAssignModal(false)}>Cancel</button>
