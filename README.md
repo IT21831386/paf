@@ -135,8 +135,8 @@ Populates DB with test users, resources, tickets, notifications, and visitor req
 | Email | Password | Role |
 |-------|----------|------|
 | admin@smartcampus.lk | admin123 | ADMIN |
-| tech1@smartcampus.lk | tech123 | TECHNICIAN |
-| security@smartcampus.lk | sec123 | SECURITY |
+| tech1@smartcampus.lk | pass123 | TECHNICIAN |
+| security@smartcampus.lk | pass123 | SECURITY |
 | john@student.lk | pass123 | USER |
 
 ## API Endpoints
