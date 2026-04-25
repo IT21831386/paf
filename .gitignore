@@ -9,9 +9,7 @@ frontend/node_modules/
 frontend/dist/
 frontend/.cache/
 
-# ========== Environment ==========
-.env
-backend/.env
+
 
 # ========== IDE ==========
 .idea/
@@ -30,3 +28,7 @@ Thumbs.db
 # ========== Logs ==========
 *.log
 logs/
+
+PAF_Assignment-*
+IT3030*
+marking*

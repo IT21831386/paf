@@ -59,3 +59,9 @@
   background: rgba(167, 139, 250, 0.2);
   color: #a78bfa;
 }
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
