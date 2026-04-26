@@ -60,6 +60,7 @@ export const getAllBookings = (params) => api.get('/bookings', { params });
 export const getBookingById = (id) => api.get(`/bookings/${id}`);
 export const createBooking = (data) => api.post('/bookings', data);
 export const updateBooking = (id, data) => api.put(`/bookings/${id}`, data);
+export const updateBookingStatus = (id, status) => api.put(`/bookings/${id}/status`, null, { params: { status } });
 export const cancelBooking = (id) => api.put(`/bookings/${id}/cancel`);
 export const deleteBooking = (id) => api.delete(`/bookings/${id}`);
 
