@@ -31,6 +31,7 @@ public class TicketService {
     private final TicketRepository ticketRepository;
     private final CommentRepository commentRepository;
     private final MongoTemplate mongoTemplate;
+    private final com.smartcampus.notification.service.NotificationService notificationService;
 
     @Value("${file.upload-dir:uploads}")
     private String uploadDir;
@@ -108,7 +109,18 @@ public class TicketService {
             ticket.setStatus(TicketStatus.IN_PROGRESS);
         }
 
-        return ticketRepository.save(ticket);
+        Ticket saved = ticketRepository.save(ticket);
+
+        // Notify the technician that a ticket was assigned to them
+        notificationService.createNotification(
+                technicianId,
+                "Ticket Assigned",
+                "You have been assigned ticket #" + id.substring(Math.max(0, id.length() - 6)) + " (" + ticket.getCategory() + ")",
+                com.smartcampus.notification.model.NotificationType.TICKET_ASSIGNED,
+                id
+        );
+
+        return saved;
     }
 
     // Update ticket status (with optional resolution notes or rejection reason)
@@ -130,7 +142,18 @@ public class TicketService {
             ticket.setRejectionReason(notes);
         }
 
-        return ticketRepository.save(ticket);
+        Ticket saved = ticketRepository.save(ticket);
+
+        // Notify the ticket owner about status change
+        notificationService.createNotification(
+                ticket.getUserId(),
+                "Ticket " + newStatus.name().replace("_", " "),
+                "Your ticket #" + id.substring(Math.max(0, id.length() - 6)) + " has been updated to " + newStatus.name().replace("_", " "),
+                com.smartcampus.notification.model.NotificationType.TICKET_STATUS,
+                id
+        );
+
+        return saved;
     }
 
     // Search/filter tickets

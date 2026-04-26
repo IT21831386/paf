@@ -14,6 +14,8 @@ import java.util.List;
 public class CommentService {
 
     private final CommentRepository commentRepository;
+    private final com.smartcampus.ticket.repository.TicketRepository ticketRepository;
+    private final com.smartcampus.notification.service.NotificationService notificationService;
 
     // Get all comments for a ticket
     public List<Comment> getCommentsByTicketId(String ticketId) {
@@ -22,7 +24,24 @@ public class CommentService {
 
     // Add a comment
     public Comment addComment(Comment comment) {
-        return commentRepository.save(comment);
+        Comment saved = commentRepository.save(comment);
+
+        // Notify ticket owner about new comment
+        try {
+            var ticket = ticketRepository.findById(comment.getTicketId()).orElse(null);
+            if (ticket != null && !ticket.getUserId().equals(comment.getUserId())) {
+                String ticketId = comment.getTicketId();
+                notificationService.createNotification(
+                        ticket.getUserId(),
+                        "New Comment",
+                        "Someone commented on your ticket #" + ticketId.substring(Math.max(0, ticketId.length() - 6)),
+                        com.smartcampus.notification.model.NotificationType.NEW_COMMENT,
+                        ticketId
+                );
+            }
+        } catch (Exception ignored) {}
+
+        return saved;
     }
 
     // Update a comment (only by the owner)
