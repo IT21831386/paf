@@ -1,7 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FaSearch, FaCalendarAlt, FaClock, FaBuilding, FaUsers, FaEye, FaTimes, FaCheck, FaTrash, FaUser } from 'react-icons/fa';
+import { FaSearch, FaCalendarAlt, FaClock, FaBuilding, FaUsers, FaEye, FaTimes, FaCheck, FaTrash, FaUser, FaMapMarkedAlt, FaThList } from 'react-icons/fa';
+import { toast } from 'react-hot-toast';
 import { getAllBookings, cancelBooking, updateBooking, deleteBooking, updateBookingStatus } from '../../api/services';
+import CampusMap from '../../components/CampusMap';
+
+
 import './Booking.css';
 
 function BookingAdmin() {
@@ -13,6 +17,7 @@ function BookingAdmin() {
   const [actionTarget, setActionTarget] = useState(null);
   const [actionType, setActionType] = useState(null); // 'APPROVE', 'CANCEL', 'DELETE'
   const [processing, setProcessing] = useState(false);
+  const [viewMode, setViewMode] = useState('list'); // 'list' or 'map'
 
   const fetchBookings = async () => {
     try {
@@ -48,19 +53,22 @@ function BookingAdmin() {
         setBookings((prev) =>
           prev.map((b) => b.id === actionTarget.id ? { ...b, status: 'CONFIRMED' } : b)
         );
+        toast.success('Booking confirmed successfully!', { icon: '✅' });
       } else if (actionType === 'CANCEL') {
         await cancelBooking(actionTarget.id);
         setBookings((prev) =>
           prev.map((b) => b.id === actionTarget.id ? { ...b, status: 'CANCELLED' } : b)
         );
+        toast.success('Booking cancelled successfully.');
       } else if (actionType === 'DELETE') {
         await deleteBooking(actionTarget.id);
         setBookings((prev) => prev.filter((b) => b.id !== actionTarget.id));
+        toast.success('Booking record deleted forever.', { icon: '🗑️' });
       }
       setActionTarget(null);
       setActionType(null);
     } catch {
-      alert(`Failed to perform ${actionType.toLowerCase()} action.`);
+      toast.error(`Failed to perform ${actionType.toLowerCase()} action.`);
     } finally {
       setProcessing(false);
     }
@@ -119,74 +127,103 @@ function BookingAdmin() {
           <option value="CANCELLED">Cancelled</option>
           <option value="COMPLETED">Completed</option>
         </select>
+
+        <div className="view-toggle-group">
+          <button 
+            type="button" 
+            className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
+            onClick={() => setViewMode('list')}
+            title="List View"
+          >
+            <FaThList />
+          </button>
+          <button 
+            type="button" 
+            className={`view-btn ${viewMode === 'map' ? 'active' : ''}`}
+            onClick={() => setViewMode('map')}
+            title="Map View"
+          >
+            <FaMapMarkedAlt />
+          </button>
+        </div>
+
         <button type="submit" className="bk-btn bk-btn-primary">Search</button>
       </form>
 
-      {loading && <div className="bk-loading">Loading all campus bookings...</div>}
-      {error && <div className="bk-error">{error}</div>}
+      {viewMode === 'map' ? (
+        <div className="booking-map-view">
+          <CampusMap hideHeader={true} />
 
-      {!loading && !error && bookings.length === 0 && (
-        <div className="bk-empty">
-          <div className="bk-empty-icon">📂</div>
-          <p>No bookings found matching your criteria.</p>
         </div>
-      )}
+      ) : (
+        <>
+          {loading && <div className="bk-loading">Loading all campus bookings...</div>}
+          {error && <div className="bk-error">{error}</div>}
 
-      {!loading && !error && bookings.length > 0 && (
-        <div className="booking-list">
-          {bookings.map((booking) => (
-            <div key={booking.id} className="booking-card">
-              <div className="booking-card-left">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-                  <h3 className="booking-card-title">{booking.purpose || 'Meeting'}</h3>
-                  {statusBadge(booking.status)}
-                </div>
-                <div className="booking-card-meta">
-                  <span><FaBuilding /> {booking.roomName || booking.resourceId}</span>
-                  <span><FaCalendarAlt /> {formatDate(booking.date)}</span>
-                  <span><FaClock /> {booking.startTime} – {booking.endTime}</span>
-                  <span><FaUser /> {booking.bookedByName || booking.bookedBy || 'Unknown User'}</span>
-                  {booking.attendees && <span><FaUsers /> {booking.attendees}</span>}
-                </div>
-              </div>
-              <div className="booking-card-actions">
-                <Link to={`/bookings/${booking.id}`} className="bk-btn bk-btn-ghost bk-btn-sm" title="View Details">
-                  <FaEye />
-                </Link>
-                
-                {booking.status === 'PENDING' && (
-                  <button
-                    className="bk-btn bk-btn-primary bk-btn-sm"
-                    onClick={() => { setActionTarget(booking); setActionType('APPROVE'); }}
-                    title="Confirm Booking"
-                    style={{ background: 'linear-gradient(135deg, #10b981, #059669)' }}
-                  >
-                    <FaCheck /> Confirm
-                  </button>
-                )}
-
-                {(booking.status === 'PENDING' || booking.status === 'CONFIRMED') && (
-                  <button
-                    className="bk-btn bk-btn-danger bk-btn-sm"
-                    onClick={() => { setActionTarget(booking); setActionType('CANCEL'); }}
-                    title="Cancel Booking"
-                  >
-                    <FaTimes /> Cancel
-                  </button>
-                )}
-
-                <button
-                  className="bk-btn bk-btn-danger bk-btn-sm"
-                  onClick={() => { setActionTarget(booking); setActionType('DELETE'); }}
-                  title="Delete Record"
-                  style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)' }}
-                >
-                  <FaTrash />
-                </button>
-              </div>
+          {!loading && !error && bookings.length === 0 && (
+            <div className="bk-empty">
+              <div className="bk-empty-icon">📂</div>
+              <p>No bookings found matching your criteria.</p>
             </div>
-          ))}
-        </div>
+          )}
+
+          {!loading && !error && bookings.length > 0 && (
+            <div className="booking-list">
+              {bookings.map((booking) => (
+                <div key={booking.id} className="booking-card">
+                  <div className="booking-card-left">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+                      <h3 className="booking-card-title">{booking.purpose || 'Meeting'}</h3>
+                      {statusBadge(booking.status)}
+                    </div>
+                    <div className="booking-card-meta">
+                      <span><FaBuilding /> {booking.roomName || booking.resourceId}</span>
+                      <span><FaCalendarAlt /> {formatDate(booking.date)}</span>
+                      <span><FaClock /> {booking.startTime} – {booking.endTime}</span>
+                      <span><FaUser /> {booking.bookedByName || booking.bookedBy || 'Unknown User'}</span>
+                      {booking.attendees && <span><FaUsers /> {booking.attendees}</span>}
+                    </div>
+                  </div>
+                  <div className="booking-card-actions">
+                    <Link to={`/bookings/${booking.id}`} className="bk-btn bk-btn-ghost bk-btn-sm" title="View Details">
+                      <FaEye />
+                    </Link>
+                    
+                    {booking.status === 'PENDING' && (
+                      <button
+                        className="bk-btn bk-btn-primary bk-btn-sm"
+                        onClick={() => { setActionTarget(booking); setActionType('APPROVE'); }}
+                        title="Confirm Booking"
+                        style={{ background: 'linear-gradient(135deg, #10b981, #059669)' }}
+                      >
+                        <FaCheck /> Confirm
+                      </button>
+                    )}
+
+                    {(booking.status === 'PENDING' || booking.status === 'CONFIRMED') && (
+                      <button
+                        className="bk-btn bk-btn-danger bk-btn-sm"
+                        onClick={() => { setActionTarget(booking); setActionType('CANCEL'); }}
+                        title="Cancel Booking"
+                      >
+                        <FaTimes /> Cancel
+                      </button>
+                    )}
+
+                    <button
+                      className="bk-btn bk-btn-danger bk-btn-sm"
+                      onClick={() => { setActionTarget(booking); setActionType('DELETE'); }}
+                      title="Delete Record"
+                      style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)' }}
+                    >
+                      <FaTrash />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </>
       )}
 
       {actionTarget && (

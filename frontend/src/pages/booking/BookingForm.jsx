@@ -1,21 +1,31 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { FaArrowLeft, FaCalendarAlt } from 'react-icons/fa';
+import { FaArrowLeft, FaCalendarAlt, FaMapMarkedAlt, FaThLarge, FaCheckCircle, FaMapMarkerAlt, FaUsers, FaBox, FaCubes, FaTools } from 'react-icons/fa';
+import { toast } from 'react-hot-toast';
 import { createBooking, updateBooking, getBookingById, getAllResources } from '../../api/services';
 import CustomDatePicker from './CustomDatePicker';
 import CustomTimePicker from './CustomTimePicker';
+import CampusMap from '../../components/CampusMap';
+import IndoorMap from '../../components/IndoorMap';
+
+
+
 import './Booking.css';
 
 const INITIAL_FORM = {
   resourceId: '',
   roomName: '',
   date: '',
-  returnDate: '', // Added for equipment
+  returnDate: '',
   startTime: '',
   endTime: '',
   purpose: '',
   attendees: '',
   notes: '',
+  firstName: '',
+  lastName: '',
+  email: '',
+  phone: '',
 };
 
 const RESOURCE_TYPES = [
@@ -23,6 +33,12 @@ const RESOURCE_TYPES = [
   { id: 'LAB', label: 'Labs', icon: '🧪' },
   { id: 'MEETING_ROOM', label: 'Meeting Rooms', icon: '🏢' },
   { id: 'EQUIPMENT', label: 'Equipment (Projector, Camera, etc.)', icon: '📷' },
+];
+
+const ALLOWED_ROOMS = [
+  'Lecture Hall A1', 'Lecture Hall A2', 'Lecture Hall B1', 'Lecture Hall B2',
+  'Computer Lab 101', 'Chemistry Lab 201', 'Electronics Lab 102', 'Research Lab 202',
+  'Conference Room B2', 'Seminar Room C1', 'Boardroom D4', 'Innovation Studio E2'
 ];
 
 function BookingForm() {
@@ -37,21 +53,38 @@ function BookingForm() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [showAllEquipment, setShowAllEquipment] = useState(false);
+  const [showMap, setShowMap] = useState(false);
+  const [mapType, setMapType] = useState('CAMPUS'); // 'CAMPUS' or 'INDOOR'
 
   useEffect(() => {
     const loadRooms = async () => {
       setLoadingRooms(true);
+      setError(null);
       try {
         const res = await getAllResources({ type: selectedType });
-        setRooms(res.data.filter((r) => r.status === 'ACTIVE'));
-      } catch {
-        setError(`Could not load resources for ${selectedType}. Make sure the backend is running.`);
+        const data = Array.isArray(res.data) ? res.data : [];
+        const seenNames = new Set();
+        setRooms(data.filter((r) => {
+          if (r.status !== 'ACTIVE') return false;
+          if (selectedType === 'EQUIPMENT') return true; 
+          if (ALLOWED_ROOMS.includes(r.name) && !seenNames.has(r.name)) {
+            seenNames.add(r.name);
+            return true;
+          }
+          return false;
+        }));
+
+        // Auto-fill user info disabled as per request
+      } catch (err) {
+        console.error('Load rooms error:', err);
+        setError(`Could not load resources. ${err.response?.data?.message || 'Please check if the backend is running.'}`);
+        setRooms([]);
       } finally {
         setLoadingRooms(false);
       }
     };
     loadRooms();
-  }, [selectedType]);
+  }, [selectedType, isEdit]);
 
   useEffect(() => {
     if (!isEdit) return;
@@ -69,6 +102,10 @@ function BookingForm() {
           purpose: b.purpose || '',
           attendees: b.attendees || '',
           notes: b.notes || '',
+          firstName: b.firstName || '',
+          lastName: b.lastName || '',
+          email: b.email || '',
+          phone: b.phone || '',
         });
       } catch {
         setError('Could not load booking details.');
@@ -82,11 +119,39 @@ function BookingForm() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleRoomSelect = (room) => {
-    setForm((prev) => ({ ...prev, resourceId: room.id, roomName: room.name }));
+  const handlePhoneChange = (e) => {
+    const value = e.target.value.replace(/\D/g, ''); // Keep only numbers
+    if (value.length <= 10) {
+      setForm(prev => ({ ...prev, phone: value }));
+    }
   };
 
-  const selectedResource = rooms.find(r => r.id === form.resourceId);
+  const handleEmailChange = (e) => {
+    const value = e.target.value;
+    // If user typed '@' and it's the only '@' in the string
+    if (value.endsWith('@') && (value.match(/@/g) || []).length === 1) {
+      setForm(prev => ({ ...prev, email: value + 'gmail.com' }));
+    } else {
+      setForm(prev => ({ ...prev, email: value }));
+    }
+  };
+
+  const handleRoomSelect = (room) => {
+    setForm((prev) => ({ ...prev, resourceId: room.id, roomName: room.name }));
+    toast.success(`Selected: ${room.name}`, {
+      id: 'selection-toast', // Prevent duplicate toasts
+      icon: '✅',
+    });
+    // Auto scroll to personal info section
+    setTimeout(() => {
+      const personalSection = document.getElementById('personal-info-section');
+      if (personalSection) {
+        personalSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
+  };
+
+  const selectedResource = (rooms || []).find(r => String(r.id) === String(form.resourceId)) || (form.resourceId ? { id: form.resourceId, name: form.roomName } : null);
 
   const handleAttendeesChange = (e) => {
     const val = parseInt(e.target.value, 10);
@@ -123,9 +188,8 @@ function BookingForm() {
   const getAvailableUnits = (room) => {
     if (!room) return 0;
     if (selectedType !== 'EQUIPMENT') return room.capacity || 0;
-    if (room.name === 'Projector Set A') return 3;
-    if (room.name === 'Projector Set B') return 5;
-    return room.capacity || 0;
+    // Use availableUnits if provided, otherwise fallback to capacity
+    return room.availableUnits != null ? room.availableUnits : (room.capacity || 0);
   };
 
   const validate = () => {
@@ -136,6 +200,11 @@ function BookingForm() {
     if (!form.endTime) return 'Please set an end time.';
     if (form.startTime >= form.endTime) return 'End time must be after start time.';
     if (!form.purpose.trim()) return 'Please enter a purpose for the meeting.';
+    if (!form.firstName.trim()) return 'Please enter your first name.';
+    if (!form.lastName.trim()) return 'Please enter your last name.';
+    if (!form.email.trim()) return 'Please enter your email.';
+    if (!form.phone.trim()) return 'Please enter your phone number.';
+    if (form.phone.length !== 10) return 'Phone number must be exactly 10 digits.';
     return null;
   };
 
@@ -164,8 +233,10 @@ function BookingForm() {
     try {
       if (isEdit) {
         await updateBooking(id, payload);
+        toast.success('Booking updated successfully!');
       } else {
         await createBooking(payload);
+        toast.success('Booking created successfully! Check your list.');
       }
       navigate('/bookings');
     } catch (err) {
@@ -215,23 +286,133 @@ function BookingForm() {
             ))}
           </div>
 
-          <div className="booking-detail-section-title">Select {RESOURCE_TYPES.find(t => t.id === selectedType)?.label.slice(0, -1)}</div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+            <div className="booking-detail-section-title" style={{ margin: 0 }}>
+              Select {RESOURCE_TYPES.find(t => t.id === selectedType)?.label.slice(0, -1)}
+            </div>
+            {form.resourceId && (
+              <div className="selected-resource-banner">
+                <FaCheckCircle style={{ color: '#10b981' }} />
+                <span>Selected: <strong>{form.roomName || (rooms || []).find(r => String(r.id) === String(form.resourceId))?.name || 'Loading...'}</strong></span>
+              </div>
+            )}
+            
+            {!form.resourceId && (
+              <div className="view-toggle-group">
+                <button 
+                  type="button" 
+                  className={`view-btn ${!showMap ? 'active' : ''}`}
+                  onClick={() => setShowMap(false)}
+                  title="Grid View"
+                >
+                  <FaThLarge />
+                </button>
+                <button 
+                  type="button" 
+                  className={`view-btn ${showMap ? 'active' : ''}`}
+                  onClick={() => setShowMap(true)}
+                  title="Map View"
+                >
+                  <FaMapMarkedAlt />
+                </button>
+              </div>
+            )}
+          </div>
 
-          {loadingRooms && <div className="bk-loading" style={{ padding: '1.5rem 0' }}>Loading resources...</div>}
+          {showMap && !form.resourceId && (
+            <div className="map-type-toggle">
+              <button 
+                type="button" 
+                className={`type-toggle-btn ${mapType === 'CAMPUS' ? 'active' : ''}`}
+                onClick={() => setMapType('CAMPUS')}
+              >
+                Campus Map
+              </button>
+              <button 
+                type="button" 
+                className={`type-toggle-btn ${mapType === 'INDOOR' ? 'active' : ''}`}
+                onClick={() => setMapType('INDOOR')}
+              >
+                Indoor Floor Plan
+              </button>
+            </div>
+          )}
 
-          {!loadingRooms && rooms.length === 0 && (
+          {loadingRooms && !form.resourceId && <div className="bk-loading" style={{ padding: '1.5rem 0' }}>Loading resources...</div>}
+
+          {!loadingRooms && rooms.length === 0 && !form.resourceId && (
             <div className="bk-error">
               No active {selectedType.toLowerCase().replace('_', ' ')}s found. Please add them in the Facilities section first.
             </div>
           )}
 
-          {!loadingRooms && rooms.length > 0 && (
-            <div className="equipment-selector-container">
+          {!loadingRooms && rooms.length > 0 && !form.resourceId && (
+            showMap ? (
+              <div className="booking-map-container" style={{ marginTop: '1rem' }}>
+                {mapType === 'CAMPUS' ? (
+                  <CampusMap 
+                    hideHeader={true}
+                    onViewIndoor={() => setMapType('INDOOR')}
+                    onSelectRoom={(loc) => {
+                      const room = (rooms || []).find(r => r.name?.toLowerCase().includes(loc.name?.toLowerCase()) || loc.name?.toLowerCase().includes(r.name?.toLowerCase()));
+                      if (room) {
+                        handleRoomSelect(room);
+                      } else {
+                        setForm(prev => ({ ...prev, resourceId: loc.id, roomName: loc.name }));
+                        // Trigger scroll manually for fallback case
+                        setTimeout(() => {
+                          const personalSection = document.getElementById('personal-info-section');
+                          if (personalSection) {
+                            personalSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                          }
+                        }, 200);
+                      }
+                      setShowMap(false);
+                      toast.success(`Selected: ${loc.name}`);
+                    }} 
+                  />
+                ) : (
+                  <IndoorMap 
+                    isEmbedded={true}
+                    onSelectRoom={(room) => {
+                      // Smart matching: Try exact match first, then fuzzy match
+                      const mapName = room.name?.toLowerCase() || '';
+                      const matchedResource = (rooms || []).find(r => {
+                        const rName = r.name?.toLowerCase() || '';
+                        return rName === mapName || (rName && mapName && (rName.includes(mapName) || mapName.includes(rName)));
+                      });
+
+                      if (matchedResource) {
+                        handleRoomSelect(matchedResource);
+                      } else {
+                        // Fallback: Just set the name and ID directly
+                        setForm(prev => ({ 
+                          ...prev, 
+                          resourceId: room.id, 
+                          roomName: room.name
+                        }));
+                        // Trigger scroll manually for fallback case
+                        setTimeout(() => {
+                          const personalSection = document.getElementById('personal-info-section');
+                          if (personalSection) {
+                            personalSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                          }
+                        }, 200);
+                      }
+                      setShowMap(false);
+                      toast.success(`Selected: ${room.name}`);
+                    }}
+                  />
+                )}
+              </div>
+            ) : (
+              <div className="equipment-selector-container">
               <div className="room-selector-grid">
-                {rooms
+                {(rooms || [])
                   .filter((room) => {
+                    if (!room) return false;
                     if (selectedType !== 'EQUIPMENT' || showAllEquipment) return true;
-                    const name = room.name.toLowerCase();
+                    const name = room.name?.toLowerCase() || '';
                     return name.includes('projector') || 
                            name.includes('microphone') || 
                            name.includes('laptop') || 
@@ -240,28 +421,34 @@ function BookingForm() {
                   .map((room) => (
                     <div
                       key={room.id}
-                      className={`room-option-card ${form.resourceId === room.id ? 'selected' : ''}`}
+                      className={`room-option-card ${String(form.resourceId) === String(room.id) ? 'selected' : ''}`}
                       onClick={() => handleRoomSelect(room)}
                     >
-                      <div className="room-option-name">{RESOURCE_TYPES.find(t => t.id === selectedType)?.icon} {room.name}</div>
+                      <div className="room-option-name">
+                        {RESOURCE_TYPES.find(t => t.id === selectedType)?.icon || '📍'} {room.name}
+                      </div>
                       <div className="room-option-meta">
-                        <div style={{ marginBottom: '2px' }}>📍 {room.location || '—'}</div>
+                        <div style={{ marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span style={{ fontSize: '0.9rem' }}>📍</span> {room.location || '—'}
+                        </div>
                         {selectedType === 'EQUIPMENT' ? (
                           <div className="equipment-meta-details">
                             <div className="equipment-meta-item">
-                              📦 Available: {room.name === 'Projector Set A' ? '3' : (room.name === 'Projector Set B' ? '5' : room.capacity)} units
+                              <span style={{ fontSize: '0.9rem' }}>📦</span> Available: {room.availableUnits != null ? room.availableUnits : (room.capacity || '0')} units
                             </div>
                           </div>
                         ) : (
-                          <div className="equipment-meta-item">👥 Capacity: {room.capacity || '—'} people</div>
+                          <div className="equipment-meta-item">
+                            <span style={{ fontSize: '0.9rem' }}>👥</span> Supports: {room.capacity || '—'} people
+                          </div>
                         )}
                       </div>
                     </div>
                   ))}
               </div>
               
-              {selectedType === 'EQUIPMENT' && !showAllEquipment && rooms.some(r => {
-                const name = r.name.toLowerCase();
+              {selectedType === 'EQUIPMENT' && !showAllEquipment && (rooms || []).some(r => {
+                const name = r.name?.toLowerCase() || '';
                 return !name.includes('projector') && 
                        !name.includes('microphone') && 
                        !name.includes('laptop') && 
@@ -269,12 +456,38 @@ function BookingForm() {
               }) && (
                 <button 
                   type="button" 
-                  className="show-more-equipment-btn"
+                  className="bk-btn bk-btn-ghost"
+                  style={{ alignSelf: 'center', marginTop: '0.5rem' }}
                   onClick={() => setShowAllEquipment(true)}
                 >
                   More Equipment
                 </button>
               )}
+            </div>
+          ))}
+
+          {/* Selection Summary Card */}
+          {form.resourceId && (
+            <div className="selection-summary-card">
+              <div className="summary-left">
+                <div className="summary-icon">
+                  {RESOURCE_TYPES.find(t => t.id === selectedType)?.icon || '📍'}
+                </div>
+                <div className="summary-text">
+                  <h3>{form.roomName || 'Selected Resource'}</h3>
+                  <p>{selectedResource?.location || 'Campus Location'}</p>
+                </div>
+              </div>
+              <button 
+                type="button" 
+                className="summary-change-btn"
+                onClick={() => {
+                  setForm(prev => ({ ...prev, resourceId: '', roomName: '' }));
+                  setShowMap(false);
+                }}
+              >
+                Change Selection
+              </button>
             </div>
           )}
 
@@ -322,6 +535,63 @@ function BookingForm() {
               </div>
             </div>
           )}
+        </div>
+
+        {/* User Information */}
+        <div id="personal-info-section" className="booking-form-card" style={{ marginBottom: '1.25rem' }}>
+          <div className="booking-detail-section-title">Personal Information</div>
+          <div className="booking-form-grid">
+            <div className="booking-form-group">
+              <label className="booking-form-label">First Name *</label>
+              <input
+                type="text"
+                name="firstName"
+                value={form.firstName}
+                onChange={handleChange}
+                placeholder="First Name"
+                className="booking-form-input"
+                required
+              />
+            </div>
+            <div className="booking-form-group">
+              <label className="booking-form-label">Last Name *</label>
+              <input
+                type="text"
+                name="lastName"
+                value={form.lastName}
+                onChange={handleChange}
+                placeholder="Last Name"
+                className="booking-form-input"
+                required
+              />
+            </div>
+            <div className="booking-form-group">
+              <label className="booking-form-label">E-mail *</label>
+              <input
+                type="email"
+                name="email"
+                value={form.email}
+                onChange={handleEmailChange}
+                placeholder="ex: myname@example.com"
+                className="booking-form-input"
+                required
+              />
+              <span className="booking-form-hint">Typing '@' will auto-fill gmail.com</span>
+            </div>
+            <div className="booking-form-group">
+              <label className="booking-form-label">Phone Number *</label>
+              <input
+                type="tel"
+                name="phone"
+                value={form.phone}
+                onChange={handlePhoneChange}
+                placeholder="e.g. 0712345678"
+                className="booking-form-input"
+                required
+              />
+              <span className="booking-form-hint">Exactly 10 digits required</span>
+            </div>
+          </div>
         </div>
 
         {/* Booking Details */}

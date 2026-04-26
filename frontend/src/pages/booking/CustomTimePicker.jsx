@@ -102,7 +102,7 @@ const CustomTimePicker = ({ selectedTime, onChange, label, startTime }) => {
                   {hours12.map(h => (
                     <div 
                       key={h} 
-                      className={`time-option ${currentDisplayHour === h ? 'selected' : ''}`}
+                      className={`time-option ${selectedTime && currentDisplayHour === h ? 'selected' : ''}`}
                       onClick={() => handleTimeSelect(h, currentMin, currentPeriod)}
                     >
                       {h}
@@ -114,7 +114,7 @@ const CustomTimePicker = ({ selectedTime, onChange, label, startTime }) => {
                   {minutes.map(m => (
                     <div 
                       key={m} 
-                      className={`time-option ${currentMin === m ? 'selected' : ''}`}
+                      className={`time-option ${selectedTime && currentMin === m ? 'selected' : ''}`}
                       onClick={() => handleTimeSelect(currentDisplayHour, m, currentPeriod)}
                     >
                       {m}
@@ -126,7 +126,7 @@ const CustomTimePicker = ({ selectedTime, onChange, label, startTime }) => {
                   {periods.map(p => (
                     <div 
                       key={p} 
-                      className={`time-option ${currentPeriod === p ? 'selected' : ''}`}
+                      className={`time-option ${selectedTime && currentPeriod === p ? 'selected' : ''}`}
                       onClick={() => handleTimeSelect(currentDisplayHour, currentMin, p)}
                     >
                       {p}

@@ -167,16 +167,26 @@ function BookingDetail() {
         </div>
       </div>
 
-      {/* Booking Meta */}
+      {/* Request Booking Info */}
       <div className="booking-detail-card">
-        <div className="booking-detail-section-title">Booking Info</div>
+        <div className="booking-detail-section-title">Request Booking Info</div>
         <div className="booking-detail-grid">
-          {booking.bookedByName && (
-            <div className="booking-detail-item">
-              <span className="booking-detail-key">Booked By</span>
-              <span className="booking-detail-value">{booking.bookedByName}</span>
-            </div>
-          )}
+          <div className="booking-detail-item">
+            <span className="booking-detail-key">Booked By</span>
+            <span className="booking-detail-value">
+              {booking.firstName && booking.lastName 
+                ? `${booking.firstName} ${booking.lastName}` 
+                : (booking.bookedByName || '—')}
+            </span>
+          </div>
+          <div className="booking-detail-item">
+            <span className="booking-detail-key">E-mail</span>
+            <span className="booking-detail-value">{booking.email || '—'}</span>
+          </div>
+          <div className="booking-detail-item">
+            <span className="booking-detail-key">Phone Number</span>
+            <span className="booking-detail-value">{booking.phone || '—'}</span>
+          </div>
           {booking.createdAt && (
             <div className="booking-detail-item">
               <span className="booking-detail-key">Created</span>
