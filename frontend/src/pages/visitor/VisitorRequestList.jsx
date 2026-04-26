@@ -147,13 +147,6 @@ function VisitorRequestList() {
         </div>
         {(isAdmin || isSecurity) && (
           <>
-            <button
-              type="button"
-              className={`btn ${showMyRequests ? 'btn-primary' : 'btn-ghost'}`}
-              onClick={() => setShowMyRequests(!showMyRequests)}
-            >
-              <FaUser /> {showMyRequests ? 'My Requests' : 'All Requests'}
-            </button>
             <button type="button" className="btn btn-ghost" onClick={() => setShowFilters(!showFilters)}>
               <FaFilter /> Filters
             </button>
@@ -263,10 +256,10 @@ function VisitorRequestList() {
                     <button className="btn btn-sm btn-danger" onClick={(e) => { e.stopPropagation(); setRejectId(r.id); }}><FaTimes /> Reject</button>
                   </>
                 )}
-                {(isSecurity || isAdmin) && r.status === 'APPROVED' && (
+                {isSecurity && r.status === 'APPROVED' && (
                   <button className="btn btn-sm btn-primary" onClick={(e) => { e.stopPropagation(); handleCheckIn(r.id); }}><FaSignInAlt /> Check In</button>
                 )}
-                {(isSecurity || isAdmin) && r.status === 'CHECKED_IN' && (
+                {isSecurity && r.status === 'CHECKED_IN' && (
                   <button className="btn btn-sm btn-primary" onClick={(e) => { e.stopPropagation(); handleCheckOut(r.id); }}><FaSignOutAlt /> Check Out</button>
                 )}
                 {(isAdmin || (user && r.createdBy === user.id)) && r.status === 'PENDING' && (

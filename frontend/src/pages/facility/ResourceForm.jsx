@@ -116,7 +116,7 @@ function ResourceForm() {
         <div className="form-grid">
           <div className="form-group">
             <label htmlFor="name">Resource Name *</label>
-            <input id="name" name="name" type="text" required minLength={3} value={formData.name}
+            <input id="name" name="name" type="text" required minLength={3} maxLength={100} value={formData.name}
               onChange={handleChange} placeholder="e.g., Lab 101" />
           </div>
 
@@ -138,7 +138,7 @@ function ResourceForm() {
 
           <div className="form-group">
             <label htmlFor="location">Location *</label>
-            <input id="location" name="location" type="text" required
+            <input id="location" name="location" type="text" required maxLength={255}
               value={formData.location} onChange={handleChange} placeholder="e.g., Building A, Floor 2" />
           </div>
 
@@ -153,7 +153,7 @@ function ResourceForm() {
 
         <div className="form-group full-width">
           <label htmlFor="description">Description</label>
-          <textarea id="description" name="description" rows="3"
+          <textarea id="description" name="description" rows="3" maxLength={500}
             value={formData.description} onChange={handleChange}
             placeholder="Additional details about this resource..." />
         </div>
@@ -165,6 +165,7 @@ function ResourceForm() {
               <input
                 type="text"
                 value={window}
+                maxLength={50}
                 onChange={(e) => handleAvailabilityChange(index, e.target.value)}
                 placeholder="e.g., Mon-Fri 08:00-17:00"
               />

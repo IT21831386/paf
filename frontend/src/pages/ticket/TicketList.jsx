@@ -17,15 +17,15 @@ function TicketList() {
   const [userMap, setUserMap] = useState({});
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchTechs = async () => {
       try {
         const res = await getAllUsers();
         const map = {};
-        res.data.forEach(u => { map[u.id] = u.name; });
+        res.data.forEach(t => { map[t.id] = t.name; });
         setUserMap(map);
       } catch {}
     };
-    fetchUsers();
+    fetchTechs();
   }, []);
 
   const storedUser = localStorage.getItem('user');

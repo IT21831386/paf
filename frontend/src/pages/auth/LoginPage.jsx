@@ -94,7 +94,7 @@ function LoginPage() {
           {isRegister && (
             <div className="form-group">
               <label htmlFor="name">Full Name</label>
-              <input id="name" name="name" type="text" required={isRegister}
+              <input id="name" name="name" type="text" required={isRegister} maxLength={50}
                 value={formData.name} onChange={handleChange} placeholder="Your full name" />
             </div>
           )}
