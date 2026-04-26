@@ -42,6 +42,8 @@ public class Resource {
     @Builder.Default
     private ResourceStatus status = ResourceStatus.ACTIVE;
 
+    private Integer availableUnits;
+
     private String description;
 
     @CreatedDate

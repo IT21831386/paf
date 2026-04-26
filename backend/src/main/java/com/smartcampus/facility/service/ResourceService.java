@@ -22,13 +22,17 @@ public class ResourceService {
 
     // Get all resources
     public List<Resource> getAllResources() {
-        return resourceRepository.findAll();
+        List<Resource> resources = resourceRepository.findAll();
+        resources.forEach(this::ensureAvailableUnits);
+        return resources;
     }
 
     // Get resource by ID
     public Resource getResourceById(String id) {
-        return resourceRepository.findById(id)
+        Resource resource = resourceRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Resource not found with id: " + id));
+        ensureAvailableUnits(resource);
+        return resource;
     }
 
     // Create a new resource
@@ -36,6 +40,8 @@ public class ResourceService {
         if (resource.getStatus() == null) {
             resource.setStatus(ResourceStatus.ACTIVE);
         }
+        // Initialize available units to capacity
+        resource.setAvailableUnits(resource.getCapacity());
         return resourceRepository.save(resource);
     }
 
@@ -60,6 +66,19 @@ public class ResourceService {
         resourceRepository.delete(existing);
     }
 
+    // Update available units
+    public void updateAvailableUnits(String id, int delta) {
+        Resource resource = getResourceById(id);
+        int newAvailable = resource.getAvailableUnits() + delta;
+        
+        if (newAvailable < 0) {
+            throw new com.smartcampus.exception.BadRequestException("Not enough available units for this resource.");
+        }
+        
+        resource.setAvailableUnits(newAvailable);
+        resourceRepository.save(resource);
+    }
+
     // Search and filter resources with multiple optional criteria
     public List<Resource> searchResources(String name, ResourceType type, ResourceStatus status,
                                           String location, Integer minCapacity) {
@@ -81,6 +100,14 @@ public class ResourceService {
             query.addCriteria(Criteria.where("capacity").gte(minCapacity));
         }
 
-        return mongoTemplate.find(query, Resource.class);
+        List<Resource> resources = mongoTemplate.find(query, Resource.class);
+        resources.forEach(this::ensureAvailableUnits);
+        return resources;
+    }
+
+    private void ensureAvailableUnits(Resource resource) {
+        if (resource.getAvailableUnits() == null) {
+            resource.setAvailableUnits(resource.getCapacity());
+        }
     }
 }

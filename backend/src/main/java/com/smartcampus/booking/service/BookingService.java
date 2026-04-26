@@ -5,9 +5,13 @@ import com.smartcampus.booking.model.BookingStatus;
 import com.smartcampus.booking.repository.BookingRepository;
 import com.smartcampus.exception.BadRequestException;
 import com.smartcampus.exception.ResourceNotFoundException;
+import com.smartcampus.facility.model.Resource;
+import com.smartcampus.facility.model.ResourceType;
+import com.smartcampus.facility.service.ResourceService;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -18,14 +22,16 @@ public class BookingService {
 
     private final BookingRepository bookingRepository;
     private final MongoTemplate mongoTemplate;
+    private final ResourceService resourceService;
 
-    public BookingService(BookingRepository bookingRepository, MongoTemplate mongoTemplate) {
+    public BookingService(BookingRepository bookingRepository, MongoTemplate mongoTemplate, ResourceService resourceService) {
         this.bookingRepository = bookingRepository;
         this.mongoTemplate = mongoTemplate;
+        this.resourceService = resourceService;
     }
 
     public List<Booking> getAllBookings() {
-        return bookingRepository.findAll();
+        return bookingRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"));
     }
 
     public Booking getBookingById(String id) {
@@ -53,6 +59,7 @@ public class BookingService {
             query.addCriteria(Criteria.where("date").is(date));
         }
 
+        query.with(Sort.by(Sort.Direction.DESC, "createdAt"));
         return mongoTemplate.find(query, Booking.class);
     }
 
@@ -60,6 +67,13 @@ public class BookingService {
         validateTimeRange(booking.getStartTime(), booking.getEndTime());
         checkForOverlap(booking.getResourceId(), booking.getDate(),
                 booking.getStartTime(), booking.getEndTime(), null);
+
+        // Update availability for equipment
+        Resource resource = resourceService.getResourceById(booking.getResourceId());
+        if (resource.getType() == ResourceType.EQUIPMENT) {
+            int quantity = (booking.getAttendees() != null) ? booking.getAttendees() : 1;
+            resourceService.updateAvailableUnits(booking.getResourceId(), -quantity);
+        }
 
         booking.setStatus(BookingStatus.PENDING);
         return bookingRepository.save(booking);
@@ -76,6 +90,24 @@ public class BookingService {
         checkForOverlap(updated.getResourceId(), updated.getDate(),
                 updated.getStartTime(), updated.getEndTime(), id);
 
+        // Handle equipment availability changes
+        Resource oldResource = resourceService.getResourceById(existing.getResourceId());
+        Resource newResource = resourceService.getResourceById(updated.getResourceId());
+
+        if (oldResource.getType() == ResourceType.EQUIPMENT || newResource.getType() == ResourceType.EQUIPMENT) {
+            // Restore old quantity
+            if (oldResource.getType() == ResourceType.EQUIPMENT) {
+                int oldQty = (existing.getAttendees() != null) ? existing.getAttendees() : 1;
+                resourceService.updateAvailableUnits(existing.getResourceId(), oldQty);
+            }
+            
+            // Deduct new quantity (if new is equipment)
+            if (newResource.getType() == ResourceType.EQUIPMENT) {
+                int newQty = (updated.getAttendees() != null) ? updated.getAttendees() : 1;
+                resourceService.updateAvailableUnits(updated.getResourceId(), -newQty);
+            }
+        }
+
         existing.setResourceId(updated.getResourceId());
         existing.setRoomName(updated.getRoomName());
         existing.setDate(updated.getDate());
@@ -84,7 +116,18 @@ public class BookingService {
         existing.setPurpose(updated.getPurpose());
         existing.setAttendees(updated.getAttendees());
         existing.setNotes(updated.getNotes());
+        existing.setFirstName(updated.getFirstName());
+        existing.setLastName(updated.getLastName());
+        existing.setEmail(updated.getEmail());
+        existing.setPhone(updated.getPhone());
+        existing.setStatus(updated.getStatus());
 
+        return bookingRepository.save(existing);
+    }
+
+    public Booking updateStatus(String id, BookingStatus status) {
+        Booking existing = getBookingById(id);
+        existing.setStatus(status);
         return bookingRepository.save(existing);
     }
 
@@ -98,12 +141,29 @@ public class BookingService {
             throw new BadRequestException("Cannot cancel a completed booking.");
         }
 
+        // Restore units if it was equipment
+        Resource resource = resourceService.getResourceById(existing.getResourceId());
+        if (resource.getType() == ResourceType.EQUIPMENT) {
+            int quantity = (existing.getAttendees() != null) ? existing.getAttendees() : 1;
+            resourceService.updateAvailableUnits(existing.getResourceId(), quantity);
+        }
+
         existing.setStatus(BookingStatus.CANCELLED);
         return bookingRepository.save(existing);
     }
 
     public void deleteBooking(String id) {
         Booking existing = getBookingById(id);
+        
+        // Restore units if it was equipment and not already cancelled
+        if (existing.getStatus() != BookingStatus.CANCELLED) {
+            Resource resource = resourceService.getResourceById(existing.getResourceId());
+            if (resource.getType() == ResourceType.EQUIPMENT) {
+                int quantity = (existing.getAttendees() != null) ? existing.getAttendees() : 1;
+                resourceService.updateAvailableUnits(existing.getResourceId(), quantity);
+            }
+        }
+        
         bookingRepository.delete(existing);
     }
 

@@ -43,6 +43,18 @@ public class Booking {
     private String bookedBy;
     private String bookedByName;
 
+    @NotBlank(message = "First name is required")
+    private String firstName;
+
+    @NotBlank(message = "Last name is required")
+    private String lastName;
+
+    @NotBlank(message = "Email is required")
+    private String email;
+
+    @NotBlank(message = "Phone number is required")
+    private String phone;
+
     private BookingStatus status = BookingStatus.PENDING;
 
     @CreatedDate
@@ -88,6 +100,18 @@ public class Booking {
 
     public String getBookedByName() { return bookedByName; }
     public void setBookedByName(String bookedByName) { this.bookedByName = bookedByName; }
+
+    public String getFirstName() { return firstName; }
+    public void setFirstName(String firstName) { this.firstName = firstName; }
+
+    public String getLastName() { return lastName; }
+    public void setLastName(String lastName) { this.lastName = lastName; }
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
 
     public BookingStatus getStatus() { return status; }
     public void setStatus(BookingStatus status) { this.status = status; }
