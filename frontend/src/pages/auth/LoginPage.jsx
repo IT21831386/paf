@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { loginUser, registerUser } from '../../api/services';
+import { loginUser, registerUser, googleSignIn } from '../../api/services';
 import { FaSignInAlt, FaUserPlus } from 'react-icons/fa';
+import { GoogleLogin } from '@react-oauth/google';
 import './Auth.css';
 
 function LoginPage() {
@@ -15,6 +16,25 @@ function LoginPage() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      setLoading(true);
+      setError(null);
+      setSuccess(null);
+      
+      const response = await googleSignIn(credentialResponse.credential);
+      const user = response.data;
+      localStorage.setItem('user', JSON.stringify(user));
+      navigate('/');
+      window.location.reload();
+    } catch (err) {
+      console.error(err);
+      setError('Google Sign-In failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -32,10 +52,9 @@ function LoginPage() {
       } else {
         response = await loginUser({ email: formData.email, password: formData.password });
         const user = response.data;
-        // Store user in localStorage
         localStorage.setItem('user', JSON.stringify(user));
         navigate('/');
-        window.location.reload(); // refresh navbar
+        window.location.reload();
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Authentication failed.');
@@ -56,7 +75,22 @@ function LoginPage() {
         {error && <div className="error-message">{error}</div>}
         {success && <div className="success-message">{success}</div>}
 
-        <form onSubmit={handleSubmit}>
+        <div className="google-auth-container" style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={() => setError('Google Sign-In was unsuccessful')}
+            theme="filled_black"
+            text={isRegister ? "signup_with" : "signin_with"}
+            shape="rectangular"
+          />
+        </div>
+        
+        <div className="auth-divider" style={{ textAlign: 'center', margin: '1rem 0', color: '#64748b', fontSize: '0.85rem' }}>
+          <span style={{ background: '#1e1b3a', padding: '0 10px', position: 'relative', zIndex: 1 }}>or continue with email</span>
+          <div style={{ height: '1px', background: 'rgba(255,255,255,0.1)', marginTop: '-10px' }}></div>
+        </div>
+
+        <form onSubmit={handleSubmit} style={{ marginTop: '1.5rem' }}>
           {isRegister && (
             <div className="form-group">
               <label htmlFor="name">Full Name</label>
@@ -73,7 +107,7 @@ function LoginPage() {
 
           <div className="form-group">
             <label htmlFor="password">Password</label>
-            <input id="password" name="password" type="password" required
+            <input id="password" name="password" type="password" required minLength={isRegister ? 6 : undefined}
               value={formData.password} onChange={handleChange} placeholder="••••••••" />
           </div>
 

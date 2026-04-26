@@ -19,6 +19,8 @@ import BookingForm from './pages/booking/BookingForm';
 import BookingDetail from './pages/booking/BookingDetail';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import NotificationPage from './pages/notification/NotificationPage';
+import VirtualTour from './pages/virtual-tour/VirtualTour';
+import VirtualTourDetail from './pages/virtual-tour/VirtualTourDetail';
 
 function App() {
   return (
@@ -55,7 +57,13 @@ function App() {
           {/* Module F: Visitor & Event Access */}
           <Route path="visitor-requests" element={<ProtectedRoute><VisitorRequestList /></ProtectedRoute>} />
           <Route path="visitor-requests/new" element={<ProtectedRoute><VisitorRequestForm /></ProtectedRoute>} />
+          <Route path="visitor-requests/edit/:id" element={<ProtectedRoute><VisitorRequestForm /></ProtectedRoute>} />
           <Route path="visitor-requests/:id" element={<ProtectedRoute><VisitorRequestDetail /></ProtectedRoute>} />
+
+          {/* Virtual Tour */}
+          <Route path="virtual-tour" element={<VirtualTour />} />
+          <Route path="virtual-tour/:buildingId" element={<VirtualTourDetail />} />
+          <Route path="virtual-tour/:buildingId/:floorId" element={<VirtualTourDetail />} />
         </Route>
       </Routes>
     </Router>

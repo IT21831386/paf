@@ -31,6 +31,14 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    // POST /api/auth/google - Google Sign In
+    @PostMapping("/google")
+    public ResponseEntity<AuthResponse> googleSignIn(@RequestBody Map<String, String> body) {
+        String credential = body.get("credential");
+        AuthResponse response = authService.googleSignIn(credential);
+        return ResponseEntity.ok(response);
+    }
+
     // GET /api/auth/me/{id} - Get current user
     @GetMapping("/me/{id}")
     public ResponseEntity<AuthResponse> getMe(@PathVariable String id) {
@@ -56,6 +64,13 @@ public class AuthController {
     public ResponseEntity<AuthResponse> updateProfile(@PathVariable String id,
                                                        @RequestBody Map<String, String> body) {
         return ResponseEntity.ok(authService.updateProfile(id, body.get("name"), body.get("avatarUrl")));
+    }
+
+    // PUT /api/auth/users/{id}/change-password
+    @PutMapping("/users/{id}/change-password")
+    public ResponseEntity<AuthResponse> changePassword(@PathVariable String id,
+                                                        @RequestBody Map<String, String> body) {
+        return ResponseEntity.ok(authService.changePassword(id, body.get("oldPassword"), body.get("newPassword")));
     }
 
     // DELETE /api/auth/users/{id} - Delete user (Admin)

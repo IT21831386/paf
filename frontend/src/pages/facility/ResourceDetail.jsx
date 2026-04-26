@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { getResourceById, deleteResource } from '../../api/services';
-import { FaEdit, FaTrash, FaArrowLeft, FaMapMarkerAlt, FaUsers } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaArrowLeft, FaMapMarkerAlt, FaUsers, FaClock, FaInfoCircle } from 'react-icons/fa';
 import './Facility.css';
 
 function ResourceDetail() {
@@ -62,6 +62,7 @@ function ResourceDetail() {
       </Link>
 
       <div className="detail-card">
+        {/* Header */}
         <div className="detail-header">
           <div>
             <h1 className="detail-title">{resource.name}</h1>
@@ -78,30 +79,43 @@ function ResourceDetail() {
           )}
         </div>
 
+        {/* Info Grid */}
         <div className="detail-body">
-          <div className="detail-row">
-            <FaMapMarkerAlt className="detail-icon" />
-            <div>
-              <span className="detail-label">Location</span>
+          <div className="detail-grid">
+            <div className="detail-field">
+              <div className="detail-field-header">
+                <FaMapMarkerAlt style={{ color: '#a78bfa' }} />
+                <span className="detail-label">Location</span>
+              </div>
               <span className="detail-value">{resource.location}</span>
             </div>
-          </div>
-          <div className="detail-row">
-            <FaUsers className="detail-icon" />
-            <div>
-              <span className="detail-label">Capacity</span>
+            <div className="detail-field">
+              <div className="detail-field-header">
+                <FaUsers style={{ color: '#60a5fa' }} />
+                <span className="detail-label">Capacity</span>
+              </div>
               <span className="detail-value">{resource.capacity} people</span>
             </div>
           </div>
+
+          {/* Description */}
           {resource.description && (
             <div className="detail-section">
-              <h3>Description</h3>
-              <p style={{ color: '#94a3b8', lineHeight: 1.6 }}>{resource.description}</p>
+              <div className="detail-field-header" style={{ marginBottom: '0.4rem' }}>
+                <FaInfoCircle style={{ color: '#4ade80' }} />
+                <h3 style={{ margin: 0 }}>Description</h3>
+              </div>
+              <p style={{ color: '#94a3b8', lineHeight: 1.6, margin: 0 }}>{resource.description}</p>
             </div>
           )}
+
+          {/* Availability */}
           {resource.availabilityWindows && resource.availabilityWindows.length > 0 && (
             <div className="detail-section">
-              <h3>Availability Windows</h3>
+              <div className="detail-field-header" style={{ marginBottom: '0.4rem' }}>
+                <FaClock style={{ color: '#fbbf24' }} />
+                <h3 style={{ margin: 0 }}>Availability Windows</h3>
+              </div>
               <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
                 {resource.availabilityWindows.map((w, i) => (
                   <span key={i} className="availability-tag">{w}</span>
@@ -109,6 +123,8 @@ function ResourceDetail() {
               </div>
             </div>
           )}
+
+          {/* Timestamps */}
           {resource.createdAt && (
             <div className="detail-meta">
               <span>Created: {new Date(resource.createdAt).toLocaleDateString()}</span>
