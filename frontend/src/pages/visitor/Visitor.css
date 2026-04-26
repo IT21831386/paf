@@ -1,6 +1,11 @@
 /* ========== Module F: Visitor Pages ========== */
 /* Inherits shared styles from Facility.css via global index.css */
 
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
 .visitor-table-wrapper {
   overflow-x: auto;
   border-radius: 14px;
@@ -10,11 +15,11 @@
 .visitor-table {
   width: 100%;
   border-collapse: collapse;
-  background: #1e1b3a;
+  background: var(--bg-surface-hover);
 }
 
 .visitor-table thead {
-  background: #16132d;
+  background: var(--bg-surface);
 }
 
 .visitor-table th {
@@ -22,7 +27,7 @@
   text-align: left;
   font-size: 0.8rem;
   font-weight: 700;
-  color: #94a3b8;
+  color: var(--text-tertiary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   white-space: nowrap;
@@ -31,7 +36,7 @@
 .visitor-table td {
   padding: 0.75rem 1rem;
   font-size: 0.85rem;
-  color: #cbd5e1;
+  color: var(--text-secondary);
   border-top: 1px solid rgba(255, 255, 255, 0.04);
 }
 
@@ -41,13 +46,13 @@
 
 .cell-bold {
   font-weight: 600;
-  color: #e2e8f0;
+  color: var(--text-primary);
 }
 
 .cell-sub {
   display: block;
   font-size: 0.75rem;
-  color: #64748b;
+  color: var(--text-muted);
   margin-top: 0.15rem;
 }
 
@@ -59,7 +64,7 @@
 
 .btn-info {
   background: rgba(96, 165, 250, 0.15);
-  color: #60a5fa;
+  color: var(--info-light);
   border: 1px solid rgba(96, 165, 250, 0.2);
 }
 
@@ -84,7 +89,7 @@
 }
 
 .modal-content {
-  background: #1e1b3a;
+  background: var(--bg-surface-hover);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
   padding: 2rem;
@@ -96,7 +101,7 @@
 .modal-content h3 {
   font-size: 1.2rem;
   font-weight: 700;
-  color: #e2e8f0;
+  color: var(--text-primary);
   margin: 0 0 1.2rem 0;
 }
 
@@ -107,7 +112,7 @@
 .modal-content .form-group label {
   font-size: 0.85rem;
   font-weight: 600;
-  color: #94a3b8;
+  color: var(--text-tertiary);
   margin-bottom: 0.3rem;
   display: block;
 }
@@ -115,10 +120,10 @@
 .modal-content .form-group textarea {
   width: 100%;
   padding: 0.6rem 0.75rem;
-  background: #16132d;
+  background: var(--bg-surface);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 8px;
-  color: #e2e8f0;
+  color: var(--text-primary);
   font-size: 0.9rem;
   outline: none;
   font-family: inherit;
@@ -145,13 +150,13 @@
   padding: 1.5rem;
   background: rgba(167, 139, 250, 0.08);
   border-radius: 12px;
-  color: #a78bfa;
+  color: var(--primary-light);
   margin-bottom: 1rem;
 }
 
 .qr-code-text {
   font-size: 0.7rem;
-  color: #64748b;
+  color: var(--text-muted);
   margin-top: 0.5rem;
   word-break: break-all;
 }
@@ -159,18 +164,18 @@
 .pass-details {
   text-align: left;
   padding: 1rem;
-  background: #16132d;
+  background: var(--bg-surface);
   border-radius: 10px;
 }
 
 .pass-details p {
   font-size: 0.85rem;
-  color: #cbd5e1;
+  color: var(--text-secondary);
   margin: 0.3rem 0;
 }
 
 .pass-details strong {
-  color: #94a3b8;
+  color: var(--text-tertiary);
 }
 
 /* ========== Visitor List Cards ========== */
@@ -181,7 +186,7 @@
 }
 
 .visitor-card {
-  background: #1e1b3a;
+  background: var(--bg-surface-hover);
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 14px;
   overflow: hidden;
@@ -204,13 +209,13 @@
 .visitor-name {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #e2e8f0;
+  color: var(--text-primary);
   margin: 0;
 }
 
 .visitor-purpose {
   font-size: 0.78rem;
-  color: #94a3b8;
+  color: var(--text-tertiary);
   margin-top: 0.1rem;
   display: block;
 }
@@ -233,7 +238,7 @@
 
 .visitor-info-label {
   font-size: 0.65rem;
-  color: #64748b;
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.4px;
   font-weight: 600;
@@ -241,7 +246,7 @@
 
 .visitor-info-value {
   font-size: 0.82rem;
-  color: #cbd5e1;
+  color: var(--text-secondary);
 }
 
 .visitor-card-actions {
