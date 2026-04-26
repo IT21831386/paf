@@ -1,11 +1,15 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { createVisitorRequest } from '../../api/services';
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { createVisitorRequest, getVisitorRequestById, updateVisitorRequest } from '../../api/services';
 import { FaSave, FaArrowLeft } from 'react-icons/fa';
 import './Visitor.css';
 
 function VisitorRequestForm() {
   const navigate = useNavigate();
+  const { id } = useParams();
+  const isEdit = Boolean(id);
+  const storedUser = localStorage.getItem('user');
+  const user = storedUser ? JSON.parse(storedUser) : null;
 
   const [formData, setFormData] = useState({
     visitorName: '',
@@ -17,10 +21,40 @@ function VisitorRequestForm() {
     visitTime: '',
     location: '',
     numberOfVisitors: 1,
-    createdBy: 'user1', // placeholder until auth is integrated
+    createdBy: user?.id || '',
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (isEdit) {
+      const fetchRequest = async () => {
+        try {
+          setLoading(true);
+          const response = await getVisitorRequestById(id);
+          const data = response.data;
+          setFormData({
+            visitorName: data.visitorName || '',
+            nicOrPassport: data.nicOrPassport || '',
+            hostPerson: data.hostPerson || '',
+            hostDepartment: data.hostDepartment || '',
+            purpose: data.purpose || '',
+            visitDate: data.visitDate || '',
+            visitTime: data.visitTime || '',
+            location: data.location || '',
+            numberOfVisitors: data.numberOfVisitors || 1,
+            createdBy: data.createdBy || user?.id || '',
+          });
+        } catch (err) {
+          setError('Failed to load request for editing.');
+          console.error(err);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchRequest();
+    }
+  }, [id, isEdit]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -33,12 +67,23 @@ function VisitorRequestForm() {
       setLoading(true);
       setError(null);
 
+      const selectedDateTime = new Date(`${formData.visitDate}T${formData.visitTime}`);
+      if (selectedDateTime < new Date()) {
+        setError('Visit date and time cannot be in the past.');
+        setLoading(false);
+        return;
+      }
+
       const payload = {
         ...formData,
         numberOfVisitors: parseInt(formData.numberOfVisitors),
       };
 
-      await createVisitorRequest(payload);
+      if (isEdit) {
+        await updateVisitorRequest(id, payload);
+      } else {
+        await createVisitorRequest(payload);
+      }
       navigate('/visitor-requests');
     } catch (err) {
       const message = err.response?.data?.errors
@@ -55,8 +100,8 @@ function VisitorRequestForm() {
     <div className="page-container">
       <div className="page-header">
         <div>
-          <h1 className="page-title">New Visitor Access Request</h1>
-          <p className="page-subtitle">Submit a request for visitor or event access</p>
+          <h1 className="page-title">{isEdit ? 'Edit Visitor Request' : 'New Visitor Access Request'}</h1>
+          <p className="page-subtitle">{isEdit ? 'Update details for ' + formData.visitorName : 'Submit a request for visitor or event access'}</p>
         </div>
         <button className="btn btn-ghost" onClick={() => navigate('/visitor-requests')}>
           <FaArrowLeft /> Back
@@ -75,7 +120,7 @@ function VisitorRequestForm() {
 
           <div className="form-group">
             <label htmlFor="nicOrPassport">NIC / Passport No. *</label>
-            <input id="nicOrPassport" name="nicOrPassport" type="text" required
+            <input id="nicOrPassport" name="nicOrPassport" type="text" required maxLength={12}
               value={formData.nicOrPassport} onChange={handleChange} placeholder="e.g., 200012345678" />
           </div>
 
@@ -100,6 +145,7 @@ function VisitorRequestForm() {
           <div className="form-group">
             <label htmlFor="visitDate">Visit Date *</label>
             <input id="visitDate" name="visitDate" type="date" required
+              min={new Date().toISOString().split('T')[0]}
               value={formData.visitDate} onChange={handleChange} />
           </div>
 

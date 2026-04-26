@@ -5,7 +5,7 @@ import {
   approveVisitorRequest, rejectVisitorRequest,
   checkInVisitorRequest, checkOutVisitorRequest
 } from '../../api/services';
-import { FaPlus, FaSearch, FaFilter, FaCheck, FaTimes, FaSignInAlt, FaSignOutAlt, FaTrash, FaUser, FaEye } from 'react-icons/fa';
+import { FaPlus, FaSearch, FaFilter, FaCheck, FaTimes, FaSignInAlt, FaSignOutAlt, FaTrash, FaUser, FaEye, FaSyncAlt, FaEdit } from 'react-icons/fa';
 import './Visitor.css';
 
 function VisitorRequestList() {
@@ -37,7 +37,8 @@ function VisitorRequestList() {
         if (filterDepartment) params.department = filterDepartment;
         response = await getAllVisitorRequests(params);
       }
-      setRequests(response.data);
+      const data = response.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      setRequests(data);
       setError(null);
     } catch (err) {
       setError('Failed to load visitor requests.');
@@ -48,6 +49,15 @@ function VisitorRequestList() {
   };
 
   useEffect(() => { fetchRequests(); }, [showMyRequests]);
+
+  const handleEdit = (e, request) => {
+    e.stopPropagation();
+    if (request.status !== 'PENDING') {
+      alert(`This request has already been ${request.status.toLowerCase()} and cannot be edited.`);
+    } else {
+      navigate(`/visitor-requests/edit/${request.id}`);
+    }
+  };
 
   const handleApprove = async (id) => {
     if (window.confirm('Approve this visitor request?')) {
@@ -127,7 +137,7 @@ function VisitorRequestList() {
           </>
         )}
         <button className="btn btn-primary" onClick={fetchRequests}>
-          <FaSearch /> {(isAdmin || isSecurity) ? 'Search' : 'Refresh'}
+          {(isAdmin || isSecurity) ? <FaSearch /> : <FaSyncAlt />} {(isAdmin || isSecurity) ? 'Search' : 'Refresh'}
         </button>
       </div>
 
@@ -209,6 +219,9 @@ function VisitorRequestList() {
                 <Link to={`/visitor-requests/${r.id}`} className="btn btn-sm btn-ghost" onClick={e => e.stopPropagation()}>
                   <FaEye /> View
                 </Link>
+                {(isAdmin || (user && r.createdBy === user.id)) && (
+                  <button className="btn btn-sm btn-ghost" onClick={(e) => handleEdit(e, r)}><FaEdit /> Edit</button>
+                )}
                 {isAdmin && r.status === 'PENDING' && (
                   <>
                     <button className="btn btn-sm btn-primary" onClick={(e) => { e.stopPropagation(); handleApprove(r.id); }}><FaCheck /> Approve</button>

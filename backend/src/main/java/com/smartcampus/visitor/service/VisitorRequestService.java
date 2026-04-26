@@ -22,6 +22,7 @@ public class VisitorRequestService {
 
     private final VisitorRequestRepository visitorRequestRepository;
     private final MongoTemplate mongoTemplate;
+    private final com.smartcampus.notification.service.NotificationService notificationService;
 
     // Get all visitor requests
     public List<VisitorRequest> getAllRequests() {
@@ -93,7 +94,18 @@ public class VisitorRequestService {
         request.setQrCode(UUID.randomUUID().toString());
         request.setRejectionReason(null);
 
-        return visitorRequestRepository.save(request);
+        VisitorRequest saved = visitorRequestRepository.save(request);
+
+        // Notify the requester
+        notificationService.createNotification(
+                request.getCreatedBy(),
+                "Visitor Request Approved",
+                "Your visitor request for " + request.getVisitorName() + " has been approved.",
+                com.smartcampus.notification.model.NotificationType.VISITOR_APPROVED,
+                id
+        );
+
+        return saved;
     }
 
     // Reject a visitor request (Admin)
@@ -112,7 +124,18 @@ public class VisitorRequestService {
         request.setRejectionReason(reason);
         request.setQrCode(null);
 
-        return visitorRequestRepository.save(request);
+        VisitorRequest saved = visitorRequestRepository.save(request);
+
+        // Notify the requester
+        notificationService.createNotification(
+                request.getCreatedBy(),
+                "Visitor Request Rejected",
+                "Your visitor request for " + request.getVisitorName() + " was rejected. Reason: " + reason,
+                com.smartcampus.notification.model.NotificationType.VISITOR_REJECTED,
+                id
+        );
+
+        return saved;
     }
 
     // Check-in a visitor (Security)

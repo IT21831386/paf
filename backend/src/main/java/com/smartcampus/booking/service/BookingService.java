@@ -18,10 +18,13 @@ public class BookingService {
 
     private final BookingRepository bookingRepository;
     private final MongoTemplate mongoTemplate;
+    private final com.smartcampus.notification.service.NotificationService notificationService;
 
-    public BookingService(BookingRepository bookingRepository, MongoTemplate mongoTemplate) {
+    public BookingService(BookingRepository bookingRepository, MongoTemplate mongoTemplate,
+                          com.smartcampus.notification.service.NotificationService notificationService) {
         this.bookingRepository = bookingRepository;
         this.mongoTemplate = mongoTemplate;
+        this.notificationService = notificationService;
     }
 
     public List<Booking> getAllBookings() {
@@ -99,7 +102,18 @@ public class BookingService {
         }
 
         existing.setStatus(BookingStatus.CANCELLED);
-        return bookingRepository.save(existing);
+        Booking saved = bookingRepository.save(existing);
+
+        // Notify the booker
+        notificationService.createNotification(
+                existing.getBookedBy(),
+                "Booking Cancelled",
+                "Your booking for " + existing.getRoomName() + " on " + existing.getDate() + " has been cancelled.",
+                com.smartcampus.notification.model.NotificationType.BOOKING_REJECTED,
+                id
+        );
+
+        return saved;
     }
 
     public void deleteBooking(String id) {

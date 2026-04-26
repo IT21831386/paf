@@ -8,7 +8,7 @@
 }
 
 .stat-card {
-  background: #1e1b3a;
+  background: var(--bg-surface-hover);
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 16px;
   padding: 1.25rem;
@@ -31,14 +31,14 @@
   align-items: center;
   justify-content: center;
   font-size: 1.2rem;
-  color: #fff;
+  color: var(--text-pure);
   flex-shrink: 0;
 }
 
-.stat-purple .stat-icon { background: linear-gradient(135deg, #a78bfa, #7c3aed); }
-.stat-blue .stat-icon { background: linear-gradient(135deg, #60a5fa, #3b82f6); }
-.stat-orange .stat-icon { background: linear-gradient(135deg, #fb923c, #f97316); }
-.stat-pink .stat-icon { background: linear-gradient(135deg, #f472b6, #ec4899); }
+.stat-purple .stat-icon { background: linear-gradient(135deg, var(--primary-light), var(--primary)); }
+.stat-blue .stat-icon { background: linear-gradient(135deg, var(--info-light), var(--info)); }
+.stat-orange .stat-icon { background: linear-gradient(135deg, var(--warning-alt-light), var(--warning-alt)); }
+.stat-pink .stat-icon { background: linear-gradient(135deg, var(--pink-light), var(--pink)); }
 
 .stat-info {
   display: flex;
@@ -48,13 +48,13 @@
 .stat-value {
   font-size: 1.8rem;
   font-weight: 800;
-  color: #e2e8f0;
+  color: var(--text-primary);
   line-height: 1;
 }
 
 .stat-label {
   font-size: 0.8rem;
-  color: #94a3b8;
+  color: var(--text-tertiary);
   margin-top: 0.2rem;
 }
 
@@ -67,7 +67,7 @@
 }
 
 .dashboard-panel {
-  background: #1e1b3a;
+  background: var(--bg-surface-hover);
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 16px;
   padding: 1.25rem;
@@ -83,13 +83,13 @@
 .panel-header h3 {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #e2e8f0;
+  color: var(--text-primary);
   margin: 0;
 }
 
 .panel-link {
   font-size: 0.78rem;
-  color: #a78bfa;
+  color: var(--primary-light);
   text-decoration: none;
   display: flex;
   align-items: center;
@@ -109,7 +109,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: #16132d;
+  background: var(--bg-surface);
   padding: 0.75rem 1rem;
   border-radius: 10px;
   min-width: 70px;
@@ -124,17 +124,17 @@
 
 .breakdown-label {
   font-size: 0.7rem;
-  color: #64748b;
+  color: var(--text-muted);
   margin-top: 0.3rem;
   text-transform: uppercase;
   letter-spacing: 0.3px;
 }
 
-.text-info { color: #60a5fa; }
-.text-warning { color: #fbbf24; }
-.text-success { color: #4ade80; }
-.text-neutral { color: #94a3b8; }
-.text-danger { color: #f87171; }
+.text-info { color: var(--info-light); }
+.text-warning { color: var(--warning); }
+.text-success { color: var(--success); }
+.text-neutral { color: var(--text-tertiary); }
+.text-danger { color: var(--danger-light); }
 
 /* Panel List */
 .panel-list {
@@ -148,7 +148,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 0.6rem 0.8rem;
-  background: #16132d;
+  background: var(--bg-surface);
   border-radius: 8px;
   text-decoration: none;
   transition: background 0.15s;
@@ -169,12 +169,12 @@
 .panel-list-title {
   font-size: 0.82rem;
   font-weight: 600;
-  color: #e2e8f0;
+  color: var(--text-primary);
 }
 
 .panel-list-sub {
   font-size: 0.75rem;
-  color: #64748b;
+  color: var(--text-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -189,12 +189,12 @@
 
 .panel-list-date {
   font-size: 0.72rem;
-  color: #94a3b8;
+  color: var(--text-tertiary);
 }
 
 .panel-empty {
   text-align: center;
-  color: #64748b;
+  color: var(--text-muted);
   font-size: 0.85rem;
   padding: 1.5rem 0;
   margin: 0;
@@ -204,7 +204,7 @@
 .quick-actions h3 {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #e2e8f0;
+  color: var(--text-primary);
   margin-bottom: 0.75rem;
 }
 
@@ -220,10 +220,10 @@
   justify-content: center;
   gap: 0.5rem;
   padding: 0.75rem 1rem;
-  background: #16132d;
+  background: var(--bg-surface);
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 10px;
-  color: #cbd5e1;
+  color: var(--text-secondary);
   text-decoration: none;
   font-size: 0.85rem;
   font-weight: 600;
@@ -233,7 +233,7 @@
 .quick-action-btn:hover {
   background: rgba(167, 139, 250, 0.08);
   border-color: rgba(167, 139, 250, 0.15);
-  color: #e2e8f0;
+  color: var(--text-primary);
   transform: translateY(-1px);
 }
 
@@ -243,7 +243,7 @@
 }
 
 .chart-tooltip {
-  background: #1e1b3a;
+  background: var(--bg-surface-hover);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
   padding: 0.6rem 0.8rem;
@@ -253,15 +253,15 @@
 .chart-tooltip-label {
   font-size: 0.82rem;
   font-weight: 700;
-  color: #e2e8f0;
+  color: var(--text-primary);
   margin: 0 0 0.2rem;
 }
 
 .recharts-default-legend {
-  color: #94a3b8 !important;
+  color: var(--text-tertiary) !important;
 }
 
 .recharts-pie-label-text {
-  fill: #cbd5e1;
+  fill: var(--text-secondary);
   font-size: 0.72rem;
 }

@@ -1,5 +1,5 @@
 .navbar {
-  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+  background: linear-gradient(135deg, var(--bg-gradient-start), var(--scrollbar-thumb), var(--bg-surface-alt));
   padding: 0 2rem;
   display: flex;
   align-items: center;
@@ -16,7 +16,7 @@
   align-items: center;
   gap: 0.6rem;
   text-decoration: none;
-  color: #fff;
+  color: var(--text-pure);
 }
 
 .brand-icon {
@@ -27,7 +27,7 @@
   font-size: 1.2rem;
   font-weight: 700;
   letter-spacing: 0.5px;
-  background: linear-gradient(90deg, #a78bfa, #60a5fa);
+  background: linear-gradient(90deg, var(--primary-light), var(--info-light));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -44,7 +44,7 @@
   padding: 0.5rem 1rem;
   border-radius: 8px;
   text-decoration: none;
-  color: #cbd5e1;
+  color: var(--text-secondary);
   font-size: 0.9rem;
   font-weight: 500;
   transition: all 0.2s ease;
@@ -52,12 +52,12 @@
 
 .nav-link:hover {
   background: rgba(255, 255, 255, 0.1);
-  color: #fff;
+  color: var(--text-pure);
 }
 
 .nav-link.active {
   background: rgba(167, 139, 250, 0.2);
-  color: #a78bfa;
+  color: var(--primary-light);
 }
 
 .navbar-right {
@@ -81,7 +81,7 @@
   padding: 0.3rem 0.75rem 0.3rem 0.3rem;
   cursor: pointer;
   transition: all 0.2s;
-  color: #cbd5e1;
+  color: var(--text-secondary);
 }
 
 .user-avatar-btn:hover {
@@ -93,8 +93,8 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #a78bfa, #7c3aed);
-  color: #fff;
+  background: linear-gradient(135deg, var(--primary-light), var(--primary));
+  color: var(--text-pure);
   font-size: 0.7rem;
   font-weight: 700;
   display: flex;
@@ -113,7 +113,7 @@
 .user-avatar-name {
   font-size: 0.82rem;
   font-weight: 600;
-  color: #e2e8f0;
+  color: var(--text-primary);
   max-width: 100px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -121,7 +121,7 @@
 }
 
 .user-chevron {
-  color: #64748b;
+  color: var(--text-muted);
   transition: transform 0.2s;
   flex-shrink: 0;
 }
@@ -136,7 +136,7 @@
   top: calc(100% + 8px);
   right: 0;
   width: 220px;
-  background: #1e1b3a;
+  background: var(--bg-surface-hover);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 14px;
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
@@ -160,12 +160,12 @@
 .user-dropdown-name {
   font-size: 0.88rem;
   font-weight: 700;
-  color: #e2e8f0;
+  color: var(--text-primary);
 }
 
 .user-dropdown-role {
   font-size: 0.7rem;
-  color: #a78bfa;
+  color: var(--primary-light);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -184,7 +184,7 @@
   padding: 0.65rem 1rem;
   font-size: 0.84rem;
   font-weight: 500;
-  color: #cbd5e1;
+  color: var(--text-secondary);
   text-decoration: none;
   transition: all 0.15s;
   border: none;
@@ -196,28 +196,28 @@
 
 .user-dropdown-item:hover {
   background: rgba(167, 139, 250, 0.08);
-  color: #e2e8f0;
+  color: var(--text-primary);
 }
 
 .user-dropdown-item svg {
   font-size: 0.85rem;
-  color: #64748b;
+  color: var(--text-muted);
   flex-shrink: 0;
 }
 
 .user-dropdown-item:hover svg {
-  color: #a78bfa;
+  color: var(--primary-light);
 }
 
 .user-dropdown-logout {
-  color: #f87171;
+  color: var(--danger-light);
 }
 
 .user-dropdown-logout:hover {
   background: rgba(239, 68, 68, 0.08);
-  color: #f87171;
+  color: var(--danger-light);
 }
 
 .user-dropdown-logout svg {
-  color: #f87171;
+  color: var(--danger-light);
 }

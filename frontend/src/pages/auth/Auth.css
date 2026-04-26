@@ -9,7 +9,7 @@
 }
 
 .auth-card {
-  background: #1e1b3a;
+  background: var(--bg-surface-hover);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 20px;
   padding: 2.5rem;
@@ -32,13 +32,13 @@
 .auth-header h1 {
   font-size: 1.5rem;
   font-weight: 800;
-  color: #e2e8f0;
+  color: var(--text-primary);
   margin: 0 0 0.3rem 0;
 }
 
 .auth-header p {
   font-size: 0.85rem;
-  color: #64748b;
+  color: var(--text-muted);
   margin: 0;
 }
 
@@ -50,31 +50,31 @@
   display: block;
   font-size: 0.82rem;
   font-weight: 600;
-  color: #94a3b8;
+  color: var(--text-tertiary);
   margin-bottom: 0.3rem;
 }
 
 .auth-card .form-group input {
   width: 100%;
   padding: 0.7rem 0.9rem;
-  background: #16132d;
+  background: var(--bg-surface);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 10px;
-  color: #e2e8f0;
+  color: var(--text-primary);
   font-size: 0.9rem;
   outline: none;
   transition: border-color 0.2s;
 }
 
 .auth-card .form-group input:focus {
-  border-color: #a78bfa;
+  border-color: var(--primary-light);
 }
 
 .auth-submit {
   width: 100%;
   padding: 0.75rem;
-  background: linear-gradient(135deg, #a78bfa, #7c3aed);
-  color: #fff;
+  background: linear-gradient(135deg, var(--primary-light), var(--primary));
+  color: var(--text-pure);
   border: none;
   border-radius: 10px;
   font-size: 0.95rem;
@@ -105,13 +105,13 @@
 
 .auth-switch p {
   font-size: 0.85rem;
-  color: #64748b;
+  color: var(--text-muted);
 }
 
 .auth-switch button {
   background: none;
   border: none;
-  color: #a78bfa;
+  color: var(--primary-light);
   font-weight: 600;
   cursor: pointer;
   font-size: 0.85rem;
@@ -126,7 +126,7 @@
   border: 1px solid rgba(34, 197, 94, 0.2);
   border-radius: 10px;
   padding: 0.7rem 1rem;
-  color: #4ade80;
+  color: var(--success);
   margin-bottom: 1rem;
   font-size: 0.85rem;
 }
@@ -141,11 +141,11 @@
 .users-table {
   width: 100%;
   border-collapse: collapse;
-  background: #1e1b3a;
+  background: var(--bg-surface-hover);
 }
 
 .users-table thead {
-  background: #16132d;
+  background: var(--bg-surface);
 }
 
 .users-table th {
@@ -153,7 +153,7 @@
   text-align: left;
   font-size: 0.8rem;
   font-weight: 700;
-  color: #94a3b8;
+  color: var(--text-tertiary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   white-space: nowrap;
@@ -162,7 +162,7 @@
 .users-table td {
   padding: 0.75rem 1rem;
   font-size: 0.85rem;
-  color: #cbd5e1;
+  color: var(--text-secondary);
   border-top: 1px solid rgba(255, 255, 255, 0.04);
 }
 
@@ -181,17 +181,17 @@
   letter-spacing: 0.5px;
 }
 
-.role-admin { background: rgba(239, 68, 68, 0.12); color: #f87171; }
-.role-user { background: rgba(96, 165, 250, 0.12); color: #60a5fa; }
-.role-tech { background: rgba(250, 204, 21, 0.12); color: #fbbf24; }
-.role-security { background: rgba(34, 197, 94, 0.12); color: #4ade80; }
+.role-admin { background: rgba(239, 68, 68, 0.12); color: var(--danger-light); }
+.role-user { background: rgba(96, 165, 250, 0.12); color: var(--info-light); }
+.role-tech { background: rgba(250, 204, 21, 0.12); color: var(--warning); }
+.role-security { background: rgba(34, 197, 94, 0.12); color: var(--success); }
 
 .role-select {
   padding: 0.4rem 0.6rem;
-  background: #16132d;
+  background: var(--bg-surface);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 6px;
-  color: #e2e8f0;
+  color: var(--text-primary);
   font-size: 0.82rem;
   outline: none;
 }
@@ -206,7 +206,7 @@
 .nav-user-name {
   font-size: 0.82rem;
   font-weight: 600;
-  color: #e2e8f0;
+  color: var(--text-primary);
 }
 
 .nav-user-role {
@@ -214,7 +214,7 @@
   padding: 0.15rem 0.4rem;
   border-radius: 4px;
   background: rgba(167, 139, 250, 0.12);
-  color: #c4b5fd;
+  color: var(--primary-lighter);
   text-transform: uppercase;
   font-weight: 600;
 }
@@ -222,7 +222,7 @@
 .nav-logout {
   background: rgba(239, 68, 68, 0.1);
   border: 1px solid rgba(239, 68, 68, 0.15);
-  color: #f87171;
+  color: var(--danger-light);
   padding: 0.35rem 0.75rem;
   border-radius: 8px;
   font-size: 0.8rem;
