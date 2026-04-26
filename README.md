@@ -19,6 +19,7 @@ paf/
 │       ├── exception/          # Global error handling
 │       ├── admin/              # Admin Dashboard stats API
 │       ├── facility/           # Module A — Facilities & Assets
+│       ├── booking/            # Module B — Booking Management
 │       ├── ticket/             # Module C — Maintenance & Ticketing
 │       ├── notification/       # Module D — Notifications
 │       ├── auth/               # Module E — Authentication & Authorization
@@ -30,6 +31,7 @@ paf/
 │       └── pages/
 │           ├── admin/          # Admin Dashboard (stats, recent activity)
 │           ├── facility/       # Resource list, detail & form
+│           ├── booking/        # Booking list, detail & form
 │           ├── ticket/         # Ticket list, create, detail + comments
 │           ├── notification/   # Notification bell panel & history page
 │           ├── auth/           # Login/Register, User management, Profile
@@ -67,6 +69,13 @@ paf/
 - **Resource detail page** (`/resources/:id`) showing all fields, availability windows
 - **Clickable resource cards** navigate to detail view
 - CRUD operations restricted to **ADMIN** role only
+
+### Module B — Booking Management
+- **Booking list** with search and filter by room, status, resource, and date
+- **Booking detail page** (`/bookings/:id`) with full booking information
+- **Create/Edit bookings** via form (`/bookings/new`, `/bookings/edit/:id`)
+- **Cancel booking** workflow with status management
+- Status tracking: `PENDING` → `CONFIRMED` / `CANCELLED`
 
 ### Module C — Maintenance & Incident Ticketing
 - **"My Tickets" toggle** to filter own tickets vs all tickets
@@ -152,6 +161,18 @@ Populates DB with test users, resources, tickets, notifications, and visitor req
 
 ---
 
+### Module B — Booking Management (Member 2)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/bookings` | List all (filters: roomName, status, resourceId, bookedBy, date) |
+| GET | `/api/bookings/{id}` | Get by ID |
+| POST | `/api/bookings` | Create |
+| PUT | `/api/bookings/{id}` | Update |
+| PUT | `/api/bookings/{id}/cancel` | Cancel booking |
+| DELETE | `/api/bookings/{id}` | Delete |
+
+---
+
 ### Module C — Maintenance & Ticketing (Member 3)
 
 **Tickets:**
@@ -231,7 +252,7 @@ Populates DB with test users, resources, tickets, notifications, and visitor req
 | Member | Branch | Modules | Backend | Frontend |
 |--------|--------|---------|---------|----------|
 | Kanishka | `kanishka` | A — Facilities | Resource CRUD + search/filter | Resource list, detail & form |
-| Upeka | `upeka` | B — Booking | *(pending)* | *(pending)* |
+| Upeka | `upeka` | B — Booking | Booking CRUD + search/filter, cancel workflow | Booking list, detail & form |
 | Dineesha | `dineesha` | C — Tickets | Ticket + Comment full CRUD, file uploads, status workflow | Ticket list, create, detail with comments, My Tickets |
 | Lasitha | `lasitha` | D + E — Notifications & Auth | Notification CRUD, User auth, Admin Dashboard API, change-password | Notification bell + history, Login/Register, Profile, Admin Dashboard, ProtectedRoute |
 | Sulochana | `sulochana` | F — Visitor Access | Visitor request workflow with QR passes | Visitor request list, detail & form, role-based controls |
