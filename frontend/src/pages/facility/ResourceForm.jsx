@@ -116,7 +116,7 @@ function ResourceForm() {
         <div className="form-grid">
           <div className="form-group">
             <label htmlFor="name">Resource Name *</label>
-            <input id="name" name="name" type="text" required value={formData.name}
+            <input id="name" name="name" type="text" required minLength={3} value={formData.name}
               onChange={handleChange} placeholder="e.g., Lab 101" />
           </div>
 

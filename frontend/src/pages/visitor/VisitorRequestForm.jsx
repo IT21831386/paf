@@ -33,6 +33,13 @@ function VisitorRequestForm() {
       setLoading(true);
       setError(null);
 
+      const selectedDateTime = new Date(`${formData.visitDate}T${formData.visitTime}`);
+      if (selectedDateTime < new Date()) {
+        setError('Visit date and time cannot be in the past.');
+        setLoading(false);
+        return;
+      }
+
       const payload = {
         ...formData,
         numberOfVisitors: parseInt(formData.numberOfVisitors),
@@ -100,6 +107,7 @@ function VisitorRequestForm() {
           <div className="form-group">
             <label htmlFor="visitDate">Visit Date *</label>
             <input id="visitDate" name="visitDate" type="date" required
+              min={new Date().toISOString().split('T')[0]}
               value={formData.visitDate} onChange={handleChange} />
           </div>
 

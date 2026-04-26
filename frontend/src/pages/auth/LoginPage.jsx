@@ -107,7 +107,7 @@ function LoginPage() {
 
           <div className="form-group">
             <label htmlFor="password">Password</label>
-            <input id="password" name="password" type="password" required
+            <input id="password" name="password" type="password" required minLength={isRegister ? 6 : undefined}
               value={formData.password} onChange={handleChange} placeholder="••••••••" />
           </div>
 

@@ -138,9 +138,9 @@ function CreateTicket() {
 
         <div className="form-group full-width">
           <label htmlFor="description">Description *</label>
-          <textarea id="description" name="description" rows="4" required
+          <textarea id="description" name="description" rows="4" required minLength={10}
             value={formData.description} onChange={handleChange}
-            placeholder="Describe the issue in detail..." />
+            placeholder="Describe the issue in detail (min 10 characters)..." />
         </div>
 
         <div className="form-group full-width">
