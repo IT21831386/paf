@@ -1,11 +1,17 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { FaBuilding, FaUserShield, FaHome, FaSignInAlt, FaUsers, FaTools, FaChartBar, FaUser, FaBell, FaCalendarAlt } from 'react-icons/fa';
+
 import NotificationPanel from '../pages/notification/NotificationPanel';
 import './Navbar.css';
 
 function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  }, []);
 
   const isActive = (path) => location.pathname.startsWith(path);
 
@@ -36,8 +42,10 @@ function Navbar() {
               <FaBuilding /> <span>Facilities</span>
             </Link>
             <Link to="/bookings" className={`nav-link ${isActive('/bookings') ? 'active' : ''}`}>
-          <FaCalendarAlt /> <span>Bookings</span>
-        </Link>
+              <FaCalendarAlt /> <span>Bookings</span>
+            </Link>
+
+
         <Link to="/tickets" className={`nav-link ${isActive('/tickets') ? 'active' : ''}`}>
               <FaTools /> <span>Tickets</span>
             </Link>

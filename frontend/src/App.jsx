@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
@@ -15,14 +16,18 @@ import TicketList from './pages/ticket/TicketList';
 import CreateTicket from './pages/ticket/CreateTicket';
 import TicketDetail from './pages/ticket/TicketDetail';
 import BookingList from './pages/booking/BookingList';
+import BookingAdmin from './pages/booking/BookingAdmin';
 import BookingForm from './pages/booking/BookingForm';
 import BookingDetail from './pages/booking/BookingDetail';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import NotificationPage from './pages/notification/NotificationPage';
+import IndoorMapPage from './pages/facility/IndoorMapPage';
+
 
 function App() {
   return (
     <Router>
+      <Toaster position="top-right" reverseOrder={false} />
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
@@ -40,12 +45,15 @@ function App() {
           <Route path="tickets/:id" element={<ProtectedRoute><TicketDetail /></ProtectedRoute>} />
           {/* Module B: Meeting Room Bookings */}
           <Route path="bookings" element={<BookingList />} />
+          <Route path="bookings/admin" element={<BookingAdmin />} />
           <Route path="bookings/new" element={<BookingForm />} />
           <Route path="bookings/edit/:id" element={<BookingForm />} />
           <Route path="bookings/:id" element={<BookingDetail />} />
 
           {/* Module D: Notifications */}
           <Route path="notifications" element={<ProtectedRoute><NotificationPage /></ProtectedRoute>} />
+          <Route path="indoor-map" element={<IndoorMapPage />} />
+
 
           {/* Module E: Auth & Admin */}
           <Route path="profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
