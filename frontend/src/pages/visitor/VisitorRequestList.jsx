@@ -20,6 +20,7 @@ function VisitorRequestList() {
   const [error, setError] = useState(null);
   const [filterStatus, setFilterStatus] = useState('');
   const [filterDepartment, setFilterDepartment] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [showMyRequests, setShowMyRequests] = useState(!isAdmin && !isSecurity);
   const [rejectId, setRejectId] = useState(null);
@@ -107,6 +108,18 @@ function VisitorRequestList() {
     return <span className={map[status] || 'badge'}>{status?.replace('_', ' ')}</span>;
   };
 
+  const filteredRequests = requests.filter(r => {
+    const matchesSearch = searchTerm === '' || 
+      (r.visitorName && r.visitorName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (r.purpose && r.purpose.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (r.hostPerson && r.hostPerson.toLowerCase().includes(searchTerm.toLowerCase()));
+
+    const matchesStatus = filterStatus === '' || r.status === filterStatus;
+    const matchesDept = filterDepartment === '' || (r.department && r.department.toLowerCase().includes(filterDepartment.toLowerCase()));
+
+    return matchesSearch && matchesStatus && matchesDept;
+  });
+
   return (
     <div className="page-container">
       <div className="page-header">
@@ -122,6 +135,16 @@ function VisitorRequestList() {
       </div>
 
       <div className="search-bar">
+        <div className="search-input-wrapper">
+          <FaSearch className="search-icon" />
+          <input
+            type="text"
+            placeholder="Search visitors, purpose, host..."
+            className="search-input"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
         {(isAdmin || isSecurity) && (
           <>
             <button
@@ -137,7 +160,7 @@ function VisitorRequestList() {
           </>
         )}
         <button className="btn btn-primary" onClick={fetchRequests}>
-          {(isAdmin || isSecurity) ? <FaSearch /> : <FaSyncAlt />} {(isAdmin || isSecurity) ? 'Search' : 'Refresh'}
+          <FaSyncAlt /> Refresh
         </button>
       </div>
 
@@ -175,18 +198,18 @@ function VisitorRequestList() {
         </div>
       )}
 
-      {loading && <div className="loading-spinner">Loading...</div>}
-      {error && <div className="error-message">{error}</div>}
-
-      {!loading && !error && requests.length === 0 && (
+      {loading ? (
+        <div className="loading-spinner">Loading visitor requests...</div>
+      ) : error ? (
+        <div className="error-message">{error}</div>
+      ) : filteredRequests.length === 0 ? (
         <div className="empty-state">
-          <p>No visitor requests found.</p>
+          <h3>No visitor requests found</h3>
+          <p>You can create a new request by clicking the button above.</p>
         </div>
-      )}
-
-      {!loading && !error && requests.length > 0 && (
+      ) : (
         <div className="visitor-list">
-          {requests.map(r => (
+          {filteredRequests.map(r => (
             <div key={r.id} className="visitor-card" onClick={() => navigate(`/visitor-requests/${r.id}`)} style={{ cursor: 'pointer' }}>
               <div className="visitor-card-header">
                 <div>
@@ -213,6 +236,18 @@ function VisitorRequestList() {
                     <span className="visitor-info-label">Visitors</span>
                     <span className="visitor-info-value">{r.numberOfVisitors}</span>
                   </div>
+                  {r.checkInTime && (
+                    <div className="visitor-info-item">
+                      <span className="visitor-info-label">Checked In</span>
+                      <span className="visitor-info-value">{new Date(r.checkInTime).toLocaleString()}</span>
+                    </div>
+                  )}
+                  {r.checkOutTime && (
+                    <div className="visitor-info-item">
+                      <span className="visitor-info-label">Checked Out</span>
+                      <span className="visitor-info-value">{new Date(r.checkOutTime).toLocaleString()}</span>
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="visitor-card-actions" onClick={e => e.stopPropagation()}>
@@ -234,7 +269,7 @@ function VisitorRequestList() {
                 {(isSecurity || isAdmin) && r.status === 'CHECKED_IN' && (
                   <button className="btn btn-sm btn-primary" onClick={(e) => { e.stopPropagation(); handleCheckOut(r.id); }}><FaSignOutAlt /> Check Out</button>
                 )}
-                {(isAdmin || (user && r.createdBy === user.id)) && (
+                {(isAdmin || (user && r.createdBy === user.id)) && r.status === 'PENDING' && (
                   <button className="btn btn-sm btn-danger" onClick={(e) => { e.stopPropagation(); handleDelete(r.id); }}><FaTrash /></button>
                 )}
               </div>
