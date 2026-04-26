@@ -213,6 +213,18 @@ function VisitorRequestList() {
                     <span className="visitor-info-label">Visitors</span>
                     <span className="visitor-info-value">{r.numberOfVisitors}</span>
                   </div>
+                  {r.checkInTime && (
+                    <div className="visitor-info-item">
+                      <span className="visitor-info-label">Checked In</span>
+                      <span className="visitor-info-value">{new Date(r.checkInTime).toLocaleString()}</span>
+                    </div>
+                  )}
+                  {r.checkOutTime && (
+                    <div className="visitor-info-item">
+                      <span className="visitor-info-label">Checked Out</span>
+                      <span className="visitor-info-value">{new Date(r.checkOutTime).toLocaleString()}</span>
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="visitor-card-actions" onClick={e => e.stopPropagation()}>
@@ -234,7 +246,7 @@ function VisitorRequestList() {
                 {(isSecurity || isAdmin) && r.status === 'CHECKED_IN' && (
                   <button className="btn btn-sm btn-primary" onClick={(e) => { e.stopPropagation(); handleCheckOut(r.id); }}><FaSignOutAlt /> Check Out</button>
                 )}
-                {(isAdmin || (user && r.createdBy === user.id)) && (
+                {(isAdmin || (user && r.createdBy === user.id)) && r.status === 'PENDING' && (
                   <button className="btn btn-sm btn-danger" onClick={(e) => { e.stopPropagation(); handleDelete(r.id); }}><FaTrash /></button>
                 )}
               </div>
