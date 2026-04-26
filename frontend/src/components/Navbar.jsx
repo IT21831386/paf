@@ -12,6 +12,17 @@ function Navbar() {
 
   const isActive = (path) => location.pathname.startsWith(path);
 
+  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  };
+
   const storedUser = localStorage.getItem('user');
   const user = storedUser ? JSON.parse(storedUser) : null;
 
@@ -78,6 +89,15 @@ function Navbar() {
         )}
       </div>
       <div className="navbar-right">
+        <button 
+          className="btn btn-ghost" 
+          onClick={toggleTheme} 
+          title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+          style={{ fontSize: '1.2rem', padding: '0.4rem', marginRight: '0.5rem' }}
+        >
+          {theme === 'light' ? '🌙' : '☀️'}
+        </button>
+
         {user ? (
           <>
             <NotificationPanel userId={user.id} />

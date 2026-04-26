@@ -3,7 +3,7 @@
 }
 
 .hero-section {
-  background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+  background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--scrollbar-thumb) 50%, var(--bg-surface-alt) 100%);
   padding: 5rem 2rem;
   text-align: center;
   position: relative;
@@ -37,20 +37,20 @@
 .hero-title {
   font-size: 3rem;
   font-weight: 800;
-  color: #fff;
+  color: var(--text-pure);
   line-height: 1.2;
   margin-bottom: 1.2rem;
 }
 
 .hero-highlight {
-  background: linear-gradient(90deg, #a78bfa, #60a5fa);
+  background: linear-gradient(90deg, var(--primary-light), var(--info-light));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .hero-subtitle {
   font-size: 1.15rem;
-  color: #94a3b8;
+  color: var(--text-tertiary);
   line-height: 1.7;
   max-width: 550px;
   margin: 0 auto;
@@ -65,7 +65,7 @@
 .section-title {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #e2e8f0;
+  color: var(--text-primary);
   margin-bottom: 1.5rem;
 }
 
@@ -76,7 +76,7 @@
 }
 
 .module-card {
-  background: #1e1b3a;
+  background: var(--bg-surface-hover);
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 16px;
   padding: 2rem;
@@ -100,19 +100,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
+  color: var(--text-pure);
 }
 
 .module-card h3 {
   font-size: 1.2rem;
   font-weight: 700;
-  color: #e2e8f0;
+  color: var(--text-primary);
   margin: 0;
 }
 
 .module-card p {
   font-size: 0.9rem;
-  color: #94a3b8;
+  color: var(--text-tertiary);
   line-height: 1.6;
   margin: 0;
 }
@@ -123,7 +123,7 @@
   gap: 0.4rem;
   font-size: 0.85rem;
   font-weight: 600;
-  color: #a78bfa;
+  color: var(--primary-light);
   margin-top: auto;
   padding-top: 0.5rem;
 }
