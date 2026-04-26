@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { FaBuilding, FaUserShield, FaTools, FaArrowRight } from 'react-icons/fa';
+import { FaBuilding, FaUserShield, FaTools, FaArrowRight, FaStreetView } from 'react-icons/fa';
 import './Home.css';
 
 function Home() {
@@ -48,6 +48,17 @@ function Home() {
             </div>
             <h3>Visitor & Event Access</h3>
             <p>Submit and manage visitor access requests with digital passes and QR verification.</p>
+            <span className="module-link">
+              Explore <FaArrowRight size={12} />
+            </span>
+          </Link>
+
+          <Link to="/virtual-tour" className="module-card">
+            <div className="module-icon" style={{ background: 'linear-gradient(135deg, #10b981, #059669)' }}>
+              <FaStreetView size={28} />
+            </div>
+            <h3>Virtual Tour</h3>
+            <p>Explore the campus with interactive 360° views and guided navigation maps.</p>
             <span className="module-link">
               Explore <FaArrowRight size={12} />
             </span>

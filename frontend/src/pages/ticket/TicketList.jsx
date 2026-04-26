@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getAllTickets, getMyTickets, deleteTicket } from '../../api/services';
+import { getAllTickets, getMyTickets, deleteTicket, getAllUsers } from '../../api/services';
 import { FaPlus, FaFilter, FaSearch, FaTrash, FaEye, FaUser } from 'react-icons/fa';
 import './Ticket.css';
 
@@ -13,6 +13,20 @@ function TicketList() {
   const [filterCategory, setFilterCategory] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [showMyTickets, setShowMyTickets] = useState(false);
+  const [showAssignedToMe, setShowAssignedToMe] = useState(false);
+  const [userMap, setUserMap] = useState({});
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const res = await getAllUsers();
+        const map = {};
+        res.data.forEach(u => { map[u.id] = u.name; });
+        setUserMap(map);
+      } catch {}
+    };
+    fetchUsers();
+  }, []);
 
   const storedUser = localStorage.getItem('user');
   const user = storedUser ? JSON.parse(storedUser) : null;
@@ -25,6 +39,8 @@ function TicketList() {
       let response;
       if (showMyTickets && user) {
         response = await getMyTickets(user.id);
+      } else if (showAssignedToMe && user) {
+        response = await getAllTickets({ assignedTo: user.id });
       } else {
         const params = {};
         if (filterStatus) params.status = filterStatus;
@@ -42,7 +58,7 @@ function TicketList() {
     }
   };
 
-  useEffect(() => { fetchTickets(); }, [showMyTickets]);
+  useEffect(() => { fetchTickets(); }, [showMyTickets, showAssignedToMe]);
 
   const handleDelete = async (id) => {
     if (window.confirm('Delete this ticket and all its comments?')) {
@@ -97,10 +113,19 @@ function TicketList() {
         <button
           type="button"
           className={`btn ${showMyTickets ? 'btn-primary' : 'btn-ghost'}`}
-          onClick={() => setShowMyTickets(!showMyTickets)}
+          onClick={() => { setShowMyTickets(!showMyTickets); setShowAssignedToMe(false); }}
         >
           <FaUser /> {showMyTickets ? 'My Tickets' : 'All Tickets'}
         </button>
+        {isTechnician && (
+          <button
+            type="button"
+            className={`btn ${showAssignedToMe ? 'btn-primary' : 'btn-ghost'}`}
+            onClick={() => { setShowAssignedToMe(!showAssignedToMe); setShowMyTickets(false); }}
+          >
+            <FaUser /> Assigned to Me
+          </button>
+        )}
         <button type="button" className="btn btn-ghost" onClick={() => setShowFilters(!showFilters)}>
           <FaFilter /> Filters
         </button>
@@ -158,7 +183,8 @@ function TicketList() {
                 <p className="ticket-desc">{ticket.description}</p>
                 <div className="ticket-info-row">
                   <span>📍 {ticket.resourceId}</span>
-                  {ticket.assignedTo && <span>👷 Assigned: {ticket.assignedTo}</span>}
+                  {ticket.assignedTo && <span>👷 Assigned: {userMap[ticket.assignedTo] || ticket.assignedTo}</span>}
+                  {ticket.createdAt && <span>📅 {new Date(ticket.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</span>}
                 </div>
                 {ticket.attachments && ticket.attachments.length > 0 && (
                   <span className="attachment-count">📎 {ticket.attachments.length} attachment(s)</span>
