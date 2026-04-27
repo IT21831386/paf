@@ -34,6 +34,7 @@ function TicketDetail() {
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [techId, setTechId] = useState('');
   const [technicianList, setTechnicianList] = useState([]);
+  const [techMap, setTechMap] = useState({});
 
   const fetchData = async () => {
     try {
@@ -53,13 +54,20 @@ function TicketDetail() {
     }
   };
 
-  useEffect(() => { fetchData(); }, [id]);
+  useEffect(() => { 
+    fetchData(); 
+    loadTechnicians();
+  }, [id]);
 
   // Load technicians for assign dropdown
   const loadTechnicians = async () => {
     try {
       const res = await getAllUsers();
       setTechnicianList(res.data.filter(u => u.role === 'TECHNICIAN' || u.role === 'ADMIN'));
+      
+      const map = {};
+      res.data.forEach(t => { map[t.id] = t.name; });
+      setTechMap(map);
     } catch {}
   };
 
@@ -93,7 +101,7 @@ function TicketDetail() {
     e.preventDefault();
     if (!newComment.trim() || !user) return;
     try {
-      await addComment(id, { userId: user.id, userName: user.name, content: newComment });
+      await addComment(id, { ticketId: id, userId: user.id, userName: user.name, content: newComment });
       setNewComment('');
       const res = await getComments(id);
       setComments(res.data);
@@ -194,7 +202,7 @@ function TicketDetail() {
             <div><strong>Resource/Location:</strong> {ticket.resourceId}</div>
             <div><strong>Reported by:</strong> {ticket.userId}</div>
             <div><strong>Contact:</strong> {ticket.contactDetails || '—'}</div>
-            <div><strong>Assigned to:</strong> {ticket.assignedTo || 'Unassigned'}</div>
+            <div><strong>Assigned to:</strong> {techMap[ticket.assignedTo] || ticket.assignedTo || 'Unassigned'}</div>
             <div><strong>Created:</strong> {ticket.createdAt ? new Date(ticket.createdAt).toLocaleString() : '—'}</div>
           </div>
 

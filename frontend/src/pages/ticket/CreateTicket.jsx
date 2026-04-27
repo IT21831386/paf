@@ -12,6 +12,7 @@ function CreateTicket() {
   const [resources, setResources] = useState([]);
   const [formData, setFormData] = useState({
     resourceId: '',
+    customLocation: '',
     userId: user?.id || '',
     category: '',
     description: '',
@@ -103,8 +104,8 @@ function CreateTicket() {
               <option value="__custom">Other (type below)</option>
             </select>
             {formData.resourceId === '__custom' && (
-              <input type="text" name="resourceId" placeholder="Type custom location..."
-                onChange={handleChange} style={{ marginTop: '0.5rem' }} required />
+              <input type="text" name="customLocation" placeholder="Type custom location..."
+                value={formData.customLocation} onChange={handleChange} style={{ marginTop: '0.5rem' }} required />
             )}
           </div>
 
