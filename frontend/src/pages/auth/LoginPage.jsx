@@ -95,6 +95,7 @@ function LoginPage() {
             <div className="form-group">
               <label htmlFor="name">Full Name</label>
               <input id="name" name="name" type="text" required={isRegister} maxLength={50}
+                pattern="[a-zA-Z\s]+" title="Only letters and spaces are allowed"
                 value={formData.name} onChange={handleChange} placeholder="Your full name" />
             </div>
           )}
